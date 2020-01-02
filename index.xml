@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Home on Curiositas</title>
+    <link>/</link>
+    <description>Recent content in Home on Curiositas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 29 Dec 2019 11:15:36 +0100</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>infernoCTF: Weakened Keys</title>
+      <link>/post/2019/12/29/infernoctf-weakened-keys/</link>
+      <pubDate>Sun, 29 Dec 2019 11:15:36 +0100</pubDate>
+      
+      <guid>/post/2019/12/29/infernoctf-weakened-keys/</guid>
+      <description>Challenge Weakened Keys 400 points Local politicians and their anti crypto opinions have forced us to dumb down our AES encryption. It&#39;s OK because we think we can still use these weakened keys and still encrypt our message securely by encrypting it twice. Have a look at our code and see what you think.
+sample_encrypted_base64 = &#39;0mu0T97looX5/Oorw8ASGxfqMqrNoFajZupXrjtIAj7ECJdQXZzEmbEwdRV2J2MI&#39;
+sample_plaintext = &#39;Double AES encryption for twice the strength.Win&#39;
+flag_encrypted_base64 = &#39;lIZMVkA+pbiOxh3nNdV2bWz3gXovIy4fG7yCHa5FT44=&#39;
+Hint: our keys only include printable ASCII characters</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Mon, 23 Dec 2019 08:41:29 +0100</pubDate>
+      
+      <guid>/about/</guid>
+      <description>Hello World My name is Louis and I&#39;m an engineering student interested in cybersecurity.
+This blog has been made with Hugo with the theme hugo-classic, customized to my needs.
+Tools I use I use the one and only text editor, Vim.</description>
+    </item>
+    
+    <item>
+      <title>Santhacklaus 2019: Jacques! Au secours!</title>
+      <link>/post/2019/12/23/santhacklaus-2019-jacques-au-secours/</link>
+      <pubDate>Mon, 23 Dec 2019 08:31:21 +0100</pubDate>
+      
+      <guid>/post/2019/12/23/santhacklaus-2019-jacques-au-secours/</guid>
+      <description>Challenge Jacques! Au secours! 400 points One of our VIP clients, who wishes to remain anonymous, has apparently been hacked and all their important documents are now corrupted.
+Can you help us recover the files? We found a strange piece of software that might have caused all of this.
+File: chall_files.zip
+  The challenge gives us a zip file with:
+ a &amp;lsquo;vacation pictures&amp;rsquo; folder containing  4 encrypted images  DCIM-0533.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Curiositas</title>
+    <link>/categories/</link>
+    <description>Recent content in Categories on Curiositas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 29 Dec 2019 11:15:36 +0100</lastBuildDate>
+    
+	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Crypto</title>
+      <link>/categories/crypto/</link>
+      <pubDate>Sun, 29 Dec 2019 11:15:36 +0100</pubDate>
+      
+      <guid>/categories/crypto/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>CTF</title>
+      <link>/categories/ctf/</link>
+      <pubDate>Sun, 29 Dec 2019 11:15:36 +0100</pubDate>
+      
+      <guid>/categories/ctf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Writeup</title>
+      <link>/categories/writeup/</link>
+      <pubDate>Sun, 29 Dec 2019 11:15:36 +0100</pubDate>
+      
+      <guid>/categories/writeup/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
