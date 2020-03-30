@@ -6,10 +6,21 @@
     <description>Recent content in Home on Curiositas</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 29 Dec 2019 11:15:36 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 23 Dec 2019 08:41:29 +0100</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>TAMUCTF 2020: Obituary 1 &amp; 2</title>
+      <link>/posts/obituary/</link>
+      <pubDate>Mon, 30 Mar 2020 10:27:25 +0200</pubDate>
+      
+      <guid>/posts/obituary/</guid>
+      <description>Challenge Obituary 400 points Hey, shoot me over your latest version of the code. I have a simple nc session up, just pass it over when you&amp;rsquo;re ready.
+You&amp;rsquo;re using vim, right? You should use it; it&amp;rsquo;ll change your life. I basically depend on it for everything these days!
+   Obituary 1 We are given an OpenVPN configuration file. This will allow us to connect to the VPN and have access to 172.</description>
+    </item>
     
     <item>
       <title>infernoCTF: Weakened Keys</title>
@@ -17,7 +28,7 @@
       <pubDate>Sun, 29 Dec 2019 11:15:36 +0100</pubDate>
       
       <guid>/posts/weakened_keys/</guid>
-      <description>Challenge Weakened Keys 400 points Local politicians and their anti crypto opinions have forced us to dumb down our AES encryption. It&#39;s OK because we think we can still use these weakened keys and still encrypt our message securely by encrypting it twice. Have a look at our code and see what you think.
+      <description>Challenge Weakened Keys 400 points Local politicians and their anti crypto opinions have forced us to dumb down our AES encryption. It&amp;rsquo;s OK because we think we can still use these weakened keys and still encrypt our message securely by encrypting it twice. Have a look at our code and see what you think.
 sample_encrypted_base64 = &#39;0mu0T97looX5/Oorw8ASGxfqMqrNoFajZupXrjtIAj7ECJdQXZzEmbEwdRV2J2MI&#39;
 sample_plaintext = &#39;Double AES encryption for twice the strength.Win&#39;
 flag_encrypted_base64 = &#39;lIZMVkA+pbiOxh3nNdV2bWz3gXovIy4fG7yCHa5FT44=&#39;
@@ -30,7 +41,7 @@ Hint: our keys only include printable ASCII characters</description>
       <pubDate>Mon, 23 Dec 2019 08:41:29 +0100</pubDate>
       
       <guid>/about/</guid>
-      <description>Hello World My name is Louis and I&#39;m an engineering student interested in cybersecurity.
+      <description>Hello World My name is Louis and I&amp;rsquo;m an engineering student interested in cybersecurity.
 This blog has been made with Hugo with the theme hugo-classic, customized to my needs.
 Tools I use I use the one and only text editor, Vim.</description>
     </item>

@@ -17,7 +17,7 @@
       <pubDate>Sun, 29 Dec 2019 11:15:36 +0100</pubDate>
       
       <guid>/posts/weakened_keys/</guid>
-      <description>Challenge Weakened Keys 400 points Local politicians and their anti crypto opinions have forced us to dumb down our AES encryption. It&#39;s OK because we think we can still use these weakened keys and still encrypt our message securely by encrypting it twice. Have a look at our code and see what you think.
+      <description>Challenge Weakened Keys 400 points Local politicians and their anti crypto opinions have forced us to dumb down our AES encryption. It&amp;rsquo;s OK because we think we can still use these weakened keys and still encrypt our message securely by encrypting it twice. Have a look at our code and see what you think.
 sample_encrypted_base64 = &#39;0mu0T97looX5/Oorw8ASGxfqMqrNoFajZupXrjtIAj7ECJdQXZzEmbEwdRV2J2MI&#39;
 sample_plaintext = &#39;Double AES encryption for twice the strength.Win&#39;
 flag_encrypted_base64 = &#39;lIZMVkA+pbiOxh3nNdV2bWz3gXovIy4fG7yCHa5FT44=&#39;

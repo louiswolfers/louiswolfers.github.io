@@ -101,7 +101,7 @@ if (!doNotTrack) {
 	<h2>Weakened Keys</h2>
 	<h3>400 points</h2>
 	<div class="content">
-			<p>Local politicians and their anti crypto opinions have forced us to dumb down our AES encryption. It's OK because we think we can still use these weakened keys and still encrypt our message securely by encrypting it twice. Have a look at our code and see what you think.</p>
+			<p>Local politicians and their anti crypto opinions have forced us to dumb down our AES encryption. It&rsquo;s OK because we think we can still use these weakened keys and still encrypt our message securely by encrypting it twice. Have a look at our code and see what you think.</p>
 <p>sample_encrypted_base64 = <code>'0mu0T97looX5/Oorw8ASGxfqMqrNoFajZupXrjtIAj7ECJdQXZzEmbEwdRV2J2MI'</code></p>
 <p>sample_plaintext = <code>'Double AES encryption for twice the strength.Win'</code></p>
 <p>flag_encrypted_base64 = <code>'lIZMVkA+pbiOxh3nNdV2bWz3gXovIy4fG7yCHa5FT44='</code></p>
@@ -112,16 +112,16 @@ if (!doNotTrack) {
 </div>
 
 <h1 id="what-do-we-know">What do we know?</h1>
-<p>Let's read the <code>doubleAES.py</code> file:</p>
+<p>Let&rsquo;s read the <code>doubleAES.py</code> file:</p>
 <div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python3" data-lang="python3"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">hashlib</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">base64</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Random</span> <span style="color:#8b008b;font-weight:bold">import</span> get_random_bytes
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto.Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto.Random</span> <span style="color:#8b008b;font-weight:bold">import</span> get_random_bytes
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span style="color:#228b22"># set the flag value to some secret message</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>flag = <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">Double AES encryption for twice the strength.Win</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>flag = <span style="color:#cd5555">&#39;Double AES encryption for twice the strength.Win&#39;</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>data = flag.encode(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">utf-8</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>data = flag.encode(<span style="color:#cd5555">&#39;utf-8&#39;</span>)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span style="color:#228b22"># Local political concerns about strong encryption,</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span style="color:#228b22"># means first 224 bits of all keys have been set to 0.</span>
@@ -130,7 +130,7 @@ if (!doNotTrack) {
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>key1 = get_random_bytes(<span style="color:#b452cd">32</span>) 
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>key2 = get_random_bytes(<span style="color:#b452cd">32</span>)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>iv = hashlib.md5(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">infernoCTF</span><span style="color:#cd5555">&#34;</span>).digest()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>iv = hashlib.md5(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;infernoCTF&#34;</span>).digest()
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span style="color:#228b22"># === Encrypt ===</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>cipher_encrypt = AES.new(key1, AES.MODE_CBC, iv=iv)
@@ -183,42 +183,42 @@ $$</p>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">hashlib</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">base64</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">itertools</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto.Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span style="color:#228b22"># Meet in the middle attack</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>encrypted_message = <span style="color:#cd5555"></span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">0mu0T97looX5/Oorw8ASGxfqMqrNoFajZupXrjtIAj7ECJdQXZzEmbEwdRV2J2MI</span><span style="color:#cd5555">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>encrypted_message = <span style="color:#cd5555">&#34;0mu0T97looX5/Oorw8ASGxfqMqrNoFajZupXrjtIAj7ECJdQXZzEmbEwdRV2J2MI&#34;</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>encrypted_message = base64.b64decode(encrypted_message)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>message = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">Double AES encryption for twice the strength.Win</span><span style="color:#cd5555">&#34;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>iv = hashlib.md5(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">infernoCTF</span><span style="color:#cd5555">&#34;</span>).digest()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>message = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;Double AES encryption for twice the strength.Win&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>iv = hashlib.md5(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;infernoCTF&#34;</span>).digest()
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span style="color:#228b22"># Get all printable ASCII chars</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>printable_ascii_chars = []
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">32</span>, <span style="color:#b452cd">127</span>):
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>    printable_ascii_chars.append(i)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>prefix = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">0000000000000000000000000000</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>prefix = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;0000000000000000000000000000&#39;</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span style="color:#228b22"># Write all possible keys using permutations in a file</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">keys_output.txt</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">w</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fk:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;keys_output.txt&#39;</span>, <span style="color:#cd5555">&#39;w&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fk:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>    <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> itertools.permutations(printable_ascii_chars, <span style="color:#b452cd">4</span>):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        fk.write(f<span style="color:#cd5555"></span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">{</span><span style="color:#cd5555">(prefix + bytes(list(i))).decode()}</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>        fk.write(f<span style="color:#cd5555">&#34;{(prefix + bytes(list(i))).decode()}</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">enc_output.txt</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">w</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fe:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;enc_output.txt&#39;</span>, <span style="color:#cd5555">&#39;w&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fe:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>    <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> itertools.permutations(printable_ascii_chars, <span style="color:#b452cd">4</span>):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>        m = hashlib.new(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">md5</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>        m = hashlib.new(<span style="color:#cd5555">&#39;md5&#39;</span>)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>        kf = prefix + <span style="color:#658b00">bytes</span>(<span style="color:#658b00">list</span>(i))
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span>        cipher = AES.new(kf, AES.MODE_CBC, iv=iv)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>        m.update(cipher.encrypt(message))
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>        fe.write(f<span style="color:#cd5555"></span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">{</span><span style="color:#cd5555">m.hexdigest()}</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>        fe.write(f<span style="color:#cd5555">&#34;{m.hexdigest()}</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">dec_output.txt</span><span style="color:#cd5555">&#39;</span>, <span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">w</span><span style="color:#cd5555">&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fd:
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;dec_output.txt&#39;</span>, <span style="color:#cd5555">&#39;w&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> fd:
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>    <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> itertools.permutations(printable_ascii_chars, <span style="color:#b452cd">4</span>):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>        m = hashlib.new(<span style="color:#cd5555"></span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">md5</span><span style="color:#cd5555">&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>        m = hashlib.new(<span style="color:#cd5555">&#39;md5&#39;</span>)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>        kb = prefix + <span style="color:#658b00">bytes</span>(<span style="color:#658b00">list</span>(i))
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>        cipher = AES.new(kb, AES.MODE_CBC, iv=iv)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>        m.update(cipher.decrypt(encrypted_message))
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>        fd.write(f<span style="color:#cd5555"></span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">{</span><span style="color:#cd5555">m.hexdigest()}</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>        fd.write(f<span style="color:#cd5555">&#34;{m.hexdigest()}</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)
 </code></pre></div><p>After quite some time, we end up with 3 files:</p>
 <ul>
 <li><code>keys_output.txt</code>, with all the possible keys</li>
@@ -238,7 +238,7 @@ $$</p>
 <li>find the line number where the content of common line is found in both files</li>
 <li>retrieve the keys in the <code>keys_output.txt</code> file</li>
 </ul>
-<p>Let's do that with bash:</p>
+<p>Let&rsquo;s do that with bash:</p>
 <div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#228b22"># Sorting the files to use comm</span>
 &gt; sort enc_output.txt &gt; enc_sorted.txt 
 &gt; sort dec_output.txt &gt; dec_sorted.txt
@@ -264,15 +264,15 @@ $$</p>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">hashlib</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">base64</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">itertools</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto</span><span style="color:#008b45;text-decoration:underline">.</span><span style="color:#008b45;text-decoration:underline">Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto.Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> AES
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>encrypted_flag = <span style="color:#cd5555"></span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">lIZMVkA+pbiOxh3nNdV2bWz3gXovIy4fG7yCHa5FT44=</span><span style="color:#cd5555">&#34;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>encrypted_flag = <span style="color:#cd5555">&#34;lIZMVkA+pbiOxh3nNdV2bWz3gXovIy4fG7yCHa5FT44=&#34;</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>encrypted_flag = base64.b64decode(encrypted_flag)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>iv = hashlib.md5(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">infernoCTF</span><span style="color:#cd5555">&#34;</span>).digest()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>iv = hashlib.md5(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;infernoCTF&#34;</span>).digest()
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>key1 = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">0000000000000000000000000000021Q</span><span style="color:#cd5555">&#39;</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>key2 = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">00000000000000000000000000000(iA</span><span style="color:#cd5555">&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>key1 = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;0000000000000000000000000000021Q&#39;</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>key2 = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;00000000000000000000000000000(iA&#39;</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>cipher2 = AES.new(key2, AES.MODE_CBC, iv=iv)
 <span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>intermediate = cipher2.decrypt(encrypted_flag)
