@@ -330,7 +330,7 @@ shell_address=p64(<span style="color:#b452cd">0x0000000000400676</span>)
 	binary.interactive()
 </code></pre></div><h1 id="rainbow-pages">Rainbow Pages</h1>
 <p>We are greeted with a website where we can search for chefs. We can guess that the application makes an SQL request with the <code>LIKE</code> statement.</p>
-<p>We make the search with the URL parameter <code>search</code>. If we trying seaching for the letter <code>a</code>, the make the following GET request:</p>
+<p>We make the search with the URL parameter <code>search</code>. If we trying seaching for the letter <code>a</code>, it performs the search with the following GET request:</p>
 <pre><code>GET /index.php?search=eyBhbGxDb29rcyAoZmlsdGVyOiB7IGZpcnN0bmFtZToge2xpa2U6ICIlYSUifX0pIHsgbm9kZXMgeyBmaXJzdG5hbWUsIGxhc3RuYW1lLCBzcGVjaWFsaXR5LCBwcmljZSB9fX0=
 </code></pre><p>Decoding the base64 string, we get:</p>
 <pre><code>{ allCooks (filter: { firstname: {like: &quot;%a%&quot;}}) { nodes { firstname, lastname, speciality, price }}}
