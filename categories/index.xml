@@ -6,17 +6,35 @@
     <description>Recent content in Categories on Curiositas</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 30 Mar 2020 10:27:25 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2020 21:47:18 +0200</lastBuildDate>
     
 	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Crypto</title>
+      <link>/categories/crypto/</link>
+      <pubDate>Mon, 04 May 2020 21:47:18 +0200</pubDate>
+      
+      <guid>/categories/crypto/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>CTF</title>
       <link>/categories/ctf/</link>
-      <pubDate>Mon, 30 Mar 2020 10:27:25 +0200</pubDate>
+      <pubDate>Mon, 04 May 2020 21:47:18 +0200</pubDate>
       
       <guid>/categories/ctf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Writeup</title>
+      <link>/categories/writeup/</link>
+      <pubDate>Mon, 04 May 2020 21:47:18 +0200</pubDate>
+      
+      <guid>/categories/writeup/</guid>
       <description></description>
     </item>
     
@@ -26,24 +44,6 @@
       <pubDate>Mon, 30 Mar 2020 10:27:25 +0200</pubDate>
       
       <guid>/categories/pentest/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Writeup</title>
-      <link>/categories/writeup/</link>
-      <pubDate>Mon, 30 Mar 2020 10:27:25 +0200</pubDate>
-      
-      <guid>/categories/writeup/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Crypto</title>
-      <link>/categories/crypto/</link>
-      <pubDate>Sun, 29 Dec 2019 11:15:36 +0100</pubDate>
-      
-      <guid>/categories/crypto/</guid>
       <description></description>
     </item>
     

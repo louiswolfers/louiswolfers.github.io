@@ -6,10 +6,21 @@
     <description>Recent content in CTF on Curiositas</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 30 Mar 2020 10:27:25 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2020 21:47:18 +0200</lastBuildDate>
     
 	<atom:link href="/categories/ctf/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Writeups of some [FCSC](https://www.ssi.gouv.fr/actualite/participez-au-france-cybersecurity-challenge-fcsc-et-qualifiez-vous-pour-integrer-lequipe-france/) challenges</title>
+      <link>/posts/fcsc/</link>
+      <pubDate>Mon, 04 May 2020 21:47:18 +0200</pubDate>
+      
+      <guid>/posts/fcsc/</guid>
+      <description>Revision We are greeted with a website where we can upload two files. We have access part of the source code. Reading it we understand that the website:
+ computes the SHA-1 hash of both files checks if the computed hashes are in a database prints the flag if both files have the same hash  Testing the application we find out that it only accepts pdf files.
+Doing a little bit of research, we find that SHA-1 is vulnerable to collision attacks and that we can create two different pdf files with the same SHA-1 hash.</description>
+    </item>
     
     <item>
       <title>TAMUCTF 2020: Obituary 1 &amp; 2</title>

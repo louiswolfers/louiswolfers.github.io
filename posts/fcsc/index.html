@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="With great knowledge comes great responsibility">
-    <title>Posts | Curiositas</title>
+    <title>Writeups of some [FCSC](https://www.ssi.gouv.fr/actualite/participez-au-france-cybersecurity-challenge-fcsc-et-qualifiez-vous-pour-integrer-lequipe-france/) challenges | Curiositas</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/fonts.css" />
     <link rel="stylesheet" href="/css/theme-override.css">
@@ -77,39 +77,40 @@ if (!doNotTrack) {
   <body>
     <br/>
 
+<div class="article-meta">
+<h1><span class="title">Writeups of some <a href="https://www.ssi.gouv.fr/actualite/participez-au-france-cybersecurity-challenge-fcsc-et-qualifiez-vous-pour-integrer-lequipe-france/">FCSC</a> challenges</span></h1>
+
+<h2 class="date">2020/05/04</h2>
+<p class="terms">
+  
+  
+  Categories: <a href="/categories/ctf">CTF</a> <a href="/categories/writeup">Writeup</a> <a href="/categories/crypto">Crypto</a> 
+  
+  
+  
+  
+</p>
+</div>
+
 
 <div class="content-wrapper">
-
-  <h1>Posts</h1>
-  
-
-  
-
-  <ul>
-     
-     
-     
-     <li>
-       <span class="date">2020/05/04</span>
-       <a href="/posts/fcsc/">Writeups of some <a href="https://www.ssi.gouv.fr/actualite/participez-au-france-cybersecurity-challenge-fcsc-et-qualifiez-vous-pour-integrer-lequipe-france/">FCSC</a> challenges</a>
-     </li>
-     
-     <li>
-       <span class="date">2020/03/30</span>
-       <a href="/posts/obituary/">TAMUCTF 2020: Obituary 1 &amp; 2</a>
-     </li>
-     
-     <li>
-       <span class="date">2019/12/29</span>
-       <a href="/posts/weakened_keys/">infernoCTF: Weakened Keys</a>
-     </li>
-     
-     <li>
-       <span class="date">2019/12/23</span>
-       <a href="/posts/jacques_au_secours/">Santhacklaus 2019: Jacques! Au secours!</a>
-     </li>
-     
-   </ul>
+  <main>
+    <h1 id="revision">Revision</h1>
+<p>We are greeted with a website where we can upload two files. We have access part of the source code. Reading it we understand that the website:</p>
+<ul>
+<li>computes the SHA-1 hash of both files</li>
+<li>checks if the computed hashes are in a database</li>
+<li>prints the flag if both files have the same hash</li>
+</ul>
+<p>Testing the application we find out that it only accepts pdf files.</p>
+<p>Doing a little bit of research, we find that <a href="shattered.it">SHA-1 is vulnerable to collision attacks</a> and that we can create two different pdf files with the same SHA-1 hash. Two example pdfs are included in the website.</p>
+<p>Uploading them to the application gives:</p>
+<pre><code>Un des documents existe déjà dans la base de données. Vous semblez être sur la bonne voie...
+</code></pre><p>Now we need to find out how to modify the pdfs so that they compute the same hashes without them being in the database. Reading a little bit more, the website shows how they leveraged the pdf format by including <a href="https://shattered.it/static/pdf_format.png">this picture</a>. We understand that the only thing we have to do is to append some bytes to both pdfs and the hashes will remain the same. Appending <code>0xdeadbeef</code> to both documents and uploading them gives us the flag:</p>
+<pre><code>Bravo, vous avez trouvé une collision sha1 pour le fichier &quot;a305abf22d2e1568b33cdfb15d8fc29a34e8be28&quot; : FCSC{8f95b0fc1a793e102a65bae9c473e9a3c2893cf083a539636b082605c40c00c1}
+</code></pre>
+    <a href="/"> >> Home</a>
+  </main>
 </div>
     <footer>
       
