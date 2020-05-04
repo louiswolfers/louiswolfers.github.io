@@ -104,7 +104,7 @@ if (!doNotTrack) {
 <li>prints the flag if both files have the same hash</li>
 </ul>
 <p>Testing the application we find out that it only accepts pdf files.</p>
-<p>Doing a little bit of research, we find that <a href="shattered.it">SHA-1 is vulnerable to collision attacks</a> and that we can create two different pdf files with the same SHA-1 hash. Two example pdfs are included in the website.</p>
+<p>Doing a little bit of research, we find that <a href="https://shattered.it">SHA-1 is vulnerable to collision attacks</a> and that we can create two different pdf files with the same SHA-1 hash. Two example pdfs are included in the website.</p>
 <p>Uploading them to the application gives:</p>
 <pre><code>Un des documents existe déjà dans la base de données. Vous semblez être sur la bonne voie...
 </code></pre><p>Now we need to find out how to modify the pdfs so that they compute the same hashes without them being in the database. Reading a little bit more, the website shows how they leveraged the pdf format by including <a href="https://shattered.it/static/pdf_format.png">this picture</a>. We understand that the only thing we have to do is to append some bytes to both pdfs and the hashes will remain the same. Appending <code>0xdeadbeef</code> to both documents and uploading them gives us the flag:</p>
