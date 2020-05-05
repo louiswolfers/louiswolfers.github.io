@@ -18,8 +18,7 @@
       
       <guid>/posts/fcsc/</guid>
       <description>This are little write-ups for challenges of the France Cybersecurity Challenge CTF of 2020. I finished 123/633 in the Senior category and 217/1591 in the general ranking. I will try harder next year, I promise.
-Summary:
- Intro Le rat conteur Poney TarteTatin Babel Web Misc Randomito Baby Xoring Networks Reverse Infiltrate Web Rainbow Pages EnterTheDungeon Revision Bestiary   Intro Le rat conteur openssl enc -aes-128-ctr -d -in flag.jpg.enc -out flag.</description>
+Summary  Intro  Le rat conteur Poney TarteTatin Babel Web   Misc  Randomito Baby Xoring Networks   Reverse  Infiltrate   Web  Rainbow Pages EnterTheDungeon Revision Bestiary     Intro Le rat conteur openssl enc -aes-128-ctr -d -in flag.</description>
     </item>
     
     <item>
