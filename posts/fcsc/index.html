@@ -255,8 +255,8 @@ FCSC{83f41431c111062d003dd0213cf824d66f770a0be1305e2813f15dd76503a91d}
 <p>One method to solve this was just iterating through all the possible cases, but the last instance was a hit or miss. A better solution was to perform a <a href="https://en.wikipedia.org/wiki/Meet-in-the-middle_attack">meet-in-the-middle attack</a> (MITM). For now, let&rsquo;s forget the final permutations and the fact that we have to make a 90 degree rotation to get the real numbers getting XORed.</p>
 <p>Because we know what the final numbers are, we can divide the problem in two and get way faster results:</p>
 <ul>
-<li>store in memory all the possible 4 numbers made with $\frac{m}{2}$ XOR gates starting from the initial numbers (and the combination of XOR-gates that created this output)</li>
-<li>for all the possible permutations of the final numbers, store in memory all the possible 4 numbers made with $m-\frac{m}{2}$ XOR gates starting from the final numbers (and the combination of XOR-gates that created this output)</li>
+<li>store in memory all the possible 4 numbers made with at most $\frac{m}{2}$ XOR gates starting from the initial numbers (and the combination of XOR-gates that created this output)</li>
+<li>for all the possible permutations of the final numbers, store in memory all the possible 4 numbers made with at most $m-\frac{m}{2}$ XOR gates starting from the final numbers (and the combination of XOR-gates that created this output)</li>
 <li>compare the two: if they are exactly the same four numbers and in the same order, it means that we have found a solution</li>
 </ul>
 <p>The only thing that we need in order to make this work is to make a function that will parse the problem from the server and another one to find the right permutations, which is an easy task.</p>
@@ -348,16 +348,6 @@ r = remote(<span style="color:#cd5555">&#34;challenges2.france-cybersecurity-cha
 
     log.info(f<span style="color:#cd5555">&#34;Solving: {n}, {M}, {a}, {b}&#34;</span>)
     m, moves, permutations = find_solution(n, M, a, b)
-    <span style="color:#228b22">#log.info(f&#34;Solved with {m} XOR gates: {n}, {M}, {translate_problem(a, n)}, {translate_problem(b, n)}&#34;)</span>
-    log.info(f<span style="color:#cd5555">&#34;Solved with {m} XOR gates: {n}, {M}, {a}, {b}&#34;</span>)
-
-    log.info(<span style="color:#cd5555">&#34;----- BEGIN XNP SOLUTION -----&#34;</span>)
-    log.info(f<span style="color:#cd5555">&#34;{m}&#34;</span>)
-    <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> moves:
-      log.info(<span style="color:#cd5555">&#34;{} {}&#34;</span>.format(i[<span style="color:#b452cd">0</span>], i[<span style="color:#b452cd">1</span>]))
-    <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> permutations:
-      log.info(<span style="color:#cd5555">&#34;{}&#34;</span>.format(i))
-    log.info(<span style="color:#cd5555">&#34;------ END XNP SOLUTION ------&#34;</span>)
 
     r.sendline(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;----- BEGIN XNP SOLUTION -----&#34;</span>)
     r.sendline(<span style="color:#cd5555">&#34;{}&#34;</span>.format(m).encode())
