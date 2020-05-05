@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Misc on Curiositas</title>
+    <link>/categories/misc/</link>
+    <description>Recent content in Misc on Curiositas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 04 May 2020 21:47:18 +0200</lastBuildDate>
+    
+	<atom:link href="/categories/misc/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Writeups of some FCSC challenges</title>
+      <link>/posts/fcsc/</link>
+      <pubDate>Mon, 04 May 2020 21:47:18 +0200</pubDate>
+      
+      <guid>/posts/fcsc/</guid>
+      <description>This are little write-ups for challenges of the France Cybersecurity Challenge CTF of 2020. I finished 123/633 in the Senior category and 217/1591 in the general ranking. I will try harder next year, I promise.
+Summary  Intro  Le rat conteur Poney TarteTatin Babel Web   Misc  Randomito Baby Xoring Networks   Reverse  Infiltrate   Web  Rainbow Pages EnterTheDungeon Revision Bestiary     Intro Le rat conteur openssl enc -aes-128-ctr -d -in flag.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -8,17 +8,27 @@
   </url>
   
   <url>
-    <loc>/categories/crypto/</loc>
-    <lastmod>2020-05-04T21:47:18+02:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/categories/ctf/</loc>
     <lastmod>2020-05-04T21:47:18+02:00</lastmod>
   </url>
   
   <url>
+    <loc>/categories/misc/</loc>
+    <lastmod>2020-05-04T21:47:18+02:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/post/</loc>
+    <lastmod>2020-05-04T21:47:18+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/reverse/</loc>
+    <lastmod>2020-05-04T21:47:18+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/web/</loc>
     <lastmod>2020-05-04T21:47:18+02:00</lastmod>
   </url>
   
@@ -40,6 +50,11 @@
   <url>
     <loc>/posts/obituary/</loc>
     <lastmod>2020-03-30T10:27:25+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/crypto/</loc>
+    <lastmod>2019-12-29T11:15:36+01:00</lastmod>
   </url>
   
   <url>
