@@ -18,8 +18,7 @@
       
       <guid>/posts/fcsc/</guid>
       <description>This are little write-ups for challenges of the France Cybersecurity Challenge CTF of 2020.
-Revision We are greeted with a website where we can upload two files. We have access part of the source code. Reading it we understand that the website:
- computes the SHA-1 hash of both files checks if the computed hashes are in a database prints the flag if both files have the same hash  Testing the application we find out that it only accepts pdf files.</description>
+ Intro Le rat conteur openssl enc -aes-128-ctr -d -in flag.jpg.enc -out flag.jpg -K 00112233445566778899aabbccddeeff -iv 0000000000000000 Poney File information poney: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=06fdfc3c264bdc167a0855288210c06e16ce805e, not stripped ELF info ELF Header: Magic: 7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 Class: ELF64 Data: 2&#39;s complement, little endian Version: 1 (current) OS/ABI: UNIX - System V ABI Version: 0 Type: EXEC (Executable file) Machine: Advanced Micro Devices X86-64 Version: 0x1 Entry point address: 0x400580 Start of program headers: 64 (bytes into file) Start of section headers: 6616 (bytes into file) Flags: 0x0 Size of this header: 64 (bytes) Size of program headers: 56 (bytes) Number of program headers: 9 Size of section headers: 64 (bytes) Number of section headers: 29 Section header string table index: 28 Entry point address: 0x400580 ELF security &#39;/root/fcsc/poney/poney&#39; Arch: amd64-64-little RELRO: Full RELRO Stack: No canary found NX: NX enabled PIE: No PIE (0x400000) No execute is enabled.</description>
     </item>
     
     <item>

