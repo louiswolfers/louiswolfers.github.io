@@ -250,7 +250,7 @@ FCSC{83f41431c111062d003dd0213cf824d66f770a0be1305e2813f15dd76503a91d}
 <p>We are given 4 initial $n$-bit numbers and 4 final $n$-bit numbers:</p>
 <p><img src="/images/fcsc/bxn_instance.png" alt="Instance of a problem"></p>
 <p>We need to find the right combination of at most $m$ XOR gates so that the four initial numbers become the 4 final numbers after permutations.</p>
-<p><img src="/images/fcsc/bxn_instance.png" alt="Solution of the previous instance"></p>
+<p><img src="/images/fcsc/bxn_instance_solution.png" alt="Solution of the previous instance"></p>
 <p>The challenge starts off with 4-bit numbers and the last instance has 6-bit numbers.</p>
 <p>One method to solve this was just iterating through all the possible cases, but the last instance was a hit or miss. A better solution was to perform a <a href="https://en.wikipedia.org/wiki/Meet-in-the-middle_attack">meet-in-the-middle attack</a> (MITM). For now, let&rsquo;s forget the final permutations and the fact that we have to make a 90 degree rotation to get the real numbers getting XORed.</p>
 <p>Because we know what the final numbers are, we can divide the problem in two and get way faster results:</p>
