@@ -95,7 +95,25 @@ if (!doNotTrack) {
 
 <div class="content-wrapper">
   <main>
-    <p>This are little write-ups for challenges of the <a href="https://www.ssi.gouv.fr/actualite/participez-au-france-cybersecurity-challenge-fcsc-et-qualifiez-vous-pour-integrer-lequipe-france/">France Cybersecurity Challenge CTF</a> of 2020.</p>
+    <p>This are little write-ups for challenges of the <a href="https://www.ssi.gouv.fr/actualite/participez-au-france-cybersecurity-challenge-fcsc-et-qualifiez-vous-pour-integrer-lequipe-france/">France Cybersecurity Challenge CTF</a> of 2020. I finished 123/633 in the Senior category and 217/1591 in the general ranking. I will try harder next year, I promise.</p>
+<p>Summary:</p>
+<ul>
+<li><a href="#intro">Intro</a></li>
+<li><a href="#le-rat-conteur">Le rat conteur</a></li>
+<li><a href="#poney">Poney</a></li>
+<li><a href="#tartetatin">TarteTatin</a></li>
+<li><a href="#babel-web">Babel Web</a></li>
+<li><a href="#misc">Misc</a></li>
+<li><a href="#randomito">Randomito</a></li>
+<li><a href="#baby-xoring-networks">Baby Xoring Networks</a></li>
+<li><a href="#reverse">Reverse</a></li>
+<li><a href="#infiltrate">Infiltrate</a></li>
+<li><a href="#web">Web</a></li>
+<li><a href="#rainbow-pages">Rainbow Pages</a></li>
+<li><a href="#enterthedungeon">EnterTheDungeon</a></li>
+<li><a href="#revision">Revision</a></li>
+<li><a href="#bestiary">Bestiary</a></li>
+</ul>
 <hr>
 <h1 id="intro">Intro</h1>
 <h2 id="le-rat-conteur">Le rat conteur</h2>
@@ -228,7 +246,7 @@ FCSC{83f41431c111062d003dd0213cf824d66f770a0be1305e2813f15dd76503a91d}
 <p>Because we know what the final numbers are, we can divide the problem in two and get way faster results:</p>
 <ul>
 <li>store in memory all the possible 4 numbers made with $\frac{m}{2}$ XOR gates starting from the initial numbers (and the combination of XOR-gates that created this output)</li>
-<li>store in memory for all the possible permutations of the final numbers, get all the possible 4 numbers made with $\frac{m-frac{m}{2}}$ XOR gates starting from the final numbers (and the combination of XOR-gates that created this output)</li>
+<li>store in memory for all the possible permutations of the final numbers, get all the possible 4 numbers made with $m-\frac{m}{2}$ XOR gates starting from the final numbers (and the combination of XOR-gates that created this output)</li>
 <li>compare the two: if they are exactly the same four numbers and in the same order, it means that we have found a solution</li>
 </ul>
 <p>The only thing that we need in order to make this work is to make a function that will parse the problem from the server and another one to find the right permutations, which is an easy task.</p>
